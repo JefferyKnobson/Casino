@@ -5,10 +5,11 @@ import { CasinoButton } from "./ui/button-casino";
 import { useCasinoGame } from "@/lib/stores/useCasinoGame";
 import { useAudio } from "@/lib/stores/useAudio";
 import { playSound } from "@/lib/utils/audio";
+import GameOver from "./common/GameOver";
 
 const CasinoLobby = () => {
   const navigate = useNavigate();
-  const { setGame, balance, gameHistory } = useCasinoGame();
+  const { setGame, balance, gameHistory, isBroke, resetBalance } = useCasinoGame();
   const { isMuted } = useAudio();
 
   useEffect(() => {
@@ -26,12 +27,27 @@ const CasinoLobby = () => {
 
   return (
     <div className="max-w-full sm:max-w-6xl mx-auto pt-4 sm:pt-8 px-2">
+      {/* Show GameOver when player is broke */}
+      {isBroke && <GameOver />}
+      
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">Welcome to Casino Desperado</h1>
       
       <p className="text-center mb-6 sm:mb-8 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
         Choose your game of chance and test your luck. Your current balance is 
         <span className="font-bold text-primary"> ${balance}</span>.
       </p>
+      
+      {/* Reset balance button when broke */}
+      {isBroke && (
+        <div className="mb-8 text-center">
+          <CasinoButton
+            variant="gold"
+            onClick={resetBalance}
+          >
+            Reset Balance to $250
+          </CasinoButton>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
         <CasinoCard gradient="gold" bordered elevated className="flex flex-col h-full">
