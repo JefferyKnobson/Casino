@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { useCasinoGame } from "@/lib/stores/useCasinoGame";
+import { useAudio } from "@/lib/stores/useAudio";
 import { CasinoButton } from "../ui/button-casino";
 
 interface GameOverProps {
@@ -8,6 +10,14 @@ interface GameOverProps {
 
 const GameOver = ({ message = "You don't have enough money to bet!" }: GameOverProps) => {
   const { resetBalance, balance } = useCasinoGame();
+  const { playGameOver, isMuted } = useAudio();
+  
+  // Play game over sound when component mounts
+  useEffect(() => {
+    if (!isMuted) {
+      playGameOver();
+    }
+  }, [playGameOver, isMuted]);
 
   return (
     <motion.div

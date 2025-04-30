@@ -13,17 +13,38 @@ import { Toaster } from "./components/ui/sonner";
 
 function App() {
   const { init } = useCasinoGame();
-  const { setBackgroundMusic } = useAudio();
+  const { 
+    setBackgroundMusic,
+    setHitSound,
+    setSuccessSound,
+    setWinSound,
+    setLoseSound,
+    setGameOverSound
+  } = useAudio();
 
   useEffect(() => {
     // Initialize casino game state
     init();
     
     // Load and set up audio
-    initAudio().then(({ backgroundMusic }) => {
-      setBackgroundMusic(backgroundMusic);
+    initAudio().then((audioFiles) => {
+      // Set all the sounds in our audio store
+      setBackgroundMusic(audioFiles.backgroundMusic);
+      setHitSound(audioFiles.hitSound);
+      setSuccessSound(audioFiles.successSound);
+      setWinSound(audioFiles.winSound);
+      setLoseSound(audioFiles.lossSound);
+      setGameOverSound(audioFiles.gameOverSound);
     });
-  }, [init, setBackgroundMusic]);
+  }, [
+    init, 
+    setBackgroundMusic, 
+    setHitSound, 
+    setSuccessSound, 
+    setWinSound, 
+    setLoseSound, 
+    setGameOverSound
+  ]);
 
   return (
     <Router>

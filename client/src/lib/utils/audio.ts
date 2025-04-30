@@ -55,6 +55,11 @@ export async function initAudio(): Promise<AudioFiles> {
   lossSound.volume = 0.3;
   lossSound.playbackRate = 0.6;
   
+  // Game over sound (using hit sound but with deeper tone for dramatic effect)
+  const gameOverSound = new Audio("/sounds/hit.mp3");
+  gameOverSound.volume = 0.7;
+  gameOverSound.playbackRate = 0.5;
+  
   audioFiles = {
     backgroundMusic,
     hitSound,
@@ -64,6 +69,7 @@ export async function initAudio(): Promise<AudioFiles> {
     betSound,
     winSound,
     lossSound,
+    gameOverSound,
   };
   
   return audioFiles;
@@ -99,6 +105,9 @@ export function playSound(type: AudioType, volumeOverride?: number): void {
       break;
     case "spin":
       sound = audioFiles.spinSound;
+      break;
+    case "gameOver":
+      sound = audioFiles.gameOverSound;
       break;
     default:
       return;
