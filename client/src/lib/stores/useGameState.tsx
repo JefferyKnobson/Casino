@@ -699,32 +699,67 @@ function calculateSlotWinnings(symbols: string[], bet: number): { winAmount: num
   const winLines: number[] = [];
   let multiplier = 0;
   
-  // Check for matching symbols
-  if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
-    winLines.push(0); // Center line
-    
-    // Assign multipliers based on symbol
-    switch (symbols[0]) {
-      case "7️⃣": multiplier = 200; break;
-      case "💎": multiplier = 100; break;
-      case "🍀": multiplier = 50; break;
-      case "🔔": multiplier = 30; break;
-      case "🍇": multiplier = 20; break;
-      case "🍊": multiplier = 15; break;
-      case "🍋": multiplier = 10; break;
-      case "🍒": multiplier = 7; break;
-      default: multiplier = 5;
-    }
-  } 
-  // Check for pairs (only leftmost two matching)
-  else if (symbols[0] === symbols[1]) {
+  // Check for 3 sevens (jackpot - 100x)
+  if (symbols.every(symbol => symbol === "seven")) {
     winLines.push(0);
-    multiplier = 4; // Increased from 2 to 4 for pairs
+    multiplier = 100; // 3 sevens pays 100x
   }
-  // Check for any pair (even if not leftmost)
-  else if (symbols[1] === symbols[2]) {
+  // Check for 3 bells (25x)
+  else if (symbols.every(symbol => symbol === "bell")) {
     winLines.push(0);
-    multiplier = 3; // Added new win condition for rightmost pairs
+    multiplier = 25; // 3 bells pays 25x
+  }
+  // Check for 3 identical fruits (10x)
+  else if (
+    symbols.every(symbol => symbol === "cherry") ||
+    symbols.every(symbol => symbol === "lemon") ||
+    symbols.every(symbol => symbol === "orange") ||
+    symbols.every(symbol => symbol === "grape")
+  ) {
+    winLines.push(0);
+    multiplier = 10; // Same fruit pays 10x
+  }
+  // Check for any 3 different fruits (2x)
+  else if (
+    symbols.every(symbol => 
+      symbol === "cherry" || 
+      symbol === "lemon" || 
+      symbol === "orange" || 
+      symbol === "grape"
+    ) && 
+    symbols[0] !== symbols[1] && 
+    symbols[1] !== symbols[2] && 
+    symbols[0] !== symbols[2]
+  ) {
+    winLines.push(0);
+    multiplier = 2; // Any 3 different fruits pays 2x
+  }
+  // Check for 2 sevens (4x)
+  else if (
+    (symbols[0] === "seven" && symbols[1] === "seven") ||
+    (symbols[1] === "seven" && symbols[2] === "seven") ||
+    (symbols[0] === "seven" && symbols[2] === "seven")
+  ) {
+    winLines.push(0);
+    multiplier = 4; // 2 sevens pays 4x
+  }
+  // Check for 2 bells (3x)
+  else if (
+    (symbols[0] === "bell" && symbols[1] === "bell") ||
+    (symbols[1] === "bell" && symbols[2] === "bell") ||
+    (symbols[0] === "bell" && symbols[2] === "bell")
+  ) {
+    winLines.push(0);
+    multiplier = 3; // 2 bells pays 3x
+  }
+  // Check for any pair of matching symbols (2x)
+  else if (
+    symbols[0] === symbols[1] ||
+    symbols[1] === symbols[2] ||
+    symbols[0] === symbols[2]
+  ) {
+    winLines.push(0);
+    multiplier = 2; // Any matching pair pays 2x
   }
   
   const winAmount = bet * multiplier;

@@ -120,34 +120,40 @@ export function calculateRoundTheBusPayout(gameState: RoundTheBusGameState): num
   // If game is not finished, no payout yet
   if (gameState.phase !== "finished") return 0;
   
-  // Check if player completed the pyramid
-  const allLevelsComplete = 
-    gameState.pyramid[0].every(card => card !== null) &&
-    gameState.pyramid[1].every(card => card !== null) &&
-    gameState.pyramid[2].every(card => card !== null);
-  
-  if (allLevelsComplete) {
-    // Player completed all levels - win 3x the bet
-    return gameState.bet * 3;
-  }
-  
-  // Count how many cards were successfully placed
-  let completedCards = 0;
-  for (let i = 0; i < gameState.pyramid.length; i++) {
-    for (let j = 0; j < gameState.pyramid[i].length; j++) {
-      if (gameState.pyramid[i][j] !== null) {
-        completedCards++;
+  // Count how many rounds were completed (each level has different cards)
+  let completedRounds = 0;
+
+  // Check round 1 (first row)
+  if (gameState.pyramid[0].every(card => card !== null)) {
+    completedRounds = 1;
+    
+    // Check round 2 (second row)
+    if (gameState.pyramid[1].every(card => card !== null)) {
+      completedRounds = 2;
+      
+      // Check round 3 (third row)
+      if (gameState.pyramid[2].every(card => card !== null)) {
+        completedRounds = 3;
+        
+        // Check round 4 (final card) - not implemented in current UI but we'll support in logic
+        if (gameState.pyramid.length > 3 && gameState.pyramid[3].every(card => card !== null)) {
+          completedRounds = 4;
+        }
       }
     }
   }
   
-  // Partial completion payouts
-  if (completedCards >= 5) { // Completed 5-6 cards
-    return gameState.bet * 2;
-  } else if (completedCards >= 3) { // Completed 3-4 cards
-    return gameState.bet;
-  } else {
-    // Completed less than 3 cards - lose the bet
-    return 0;
+  // Apply multiplier based on completed rounds
+  switch (completedRounds) {
+    case 1:
+      return gameState.bet * 2; // Round 1: x2
+    case 2:
+      return gameState.bet * 5; // Round 2: x5
+    case 3:
+      return gameState.bet * 10; // Round 3: x10
+    case 4:
+      return gameState.bet * 20; // Round 4: x20
+    default:
+      return 0; // Didn't complete round 1, lose the bet
   }
 }
