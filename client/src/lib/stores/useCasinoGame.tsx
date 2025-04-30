@@ -81,7 +81,8 @@ export const useCasinoGame = create<CasinoGameState>()(
       
       checkBrokeStatus: () => {
         const { balance } = get();
-        const isBroke = balance === 0;
+        // Consider the player broke if they have less than $5 (minimum bet)
+        const isBroke = balance < 5;
         
         if (isBroke) {
           set({ isBroke: true });
