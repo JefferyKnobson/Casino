@@ -6,8 +6,8 @@ interface GameOverProps {
   message?: string;
 }
 
-const GameOver = ({ message = "You're out of money!" }: GameOverProps) => {
-  const { resetBalance } = useCasinoGame();
+const GameOver = ({ message = "You don't have enough money to bet!" }: GameOverProps) => {
+  const { resetBalance, balance } = useCasinoGame();
 
   return (
     <motion.div
@@ -23,16 +23,17 @@ const GameOver = ({ message = "You're out of money!" }: GameOverProps) => {
         transition={{ type: "spring", damping: 12 }}
       >
         <h2 className="text-3xl font-bold text-red-500 mb-2">GAME OVER</h2>
-        <p className="text-white text-lg mb-6">{message}</p>
+        <p className="text-white text-lg mb-2">{message}</p>
+        <p className="text-amber-400 text-lg mb-6">Current balance: ${balance}</p>
         
         <div className="flex flex-col gap-4">
           <CasinoButton
             variant="gold"
             size="lg"
             onClick={resetBalance}
-            className="mx-auto min-w-[200px]"
+            className="mx-auto min-w-[200px] animate-pulse"
           >
-            Reset Balance ($250)
+            Reset Balance to $250
           </CasinoButton>
         </div>
       </motion.div>

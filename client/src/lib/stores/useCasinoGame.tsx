@@ -44,18 +44,16 @@ export const useCasinoGame = create<CasinoGameState>()(
       updateBalance: (amount) => {
         set((state) => {
           const newBalance = Math.max(0, state.balance + amount);
-          const isBroke = newBalance === 0;
-          
-          // If player just went broke, show a notification
-          if (isBroke && !state.isBroke) {
-            toast.error("You're out of money! Reset your balance to keep playing.");
-          }
-          
-          return { 
-            balance: newBalance,
-            isBroke
-          };
+          return { balance: newBalance };
         });
+        
+        // Check broke status after updating balance
+        const isBroke = get().checkBrokeStatus();
+        
+        // Show notification if player just went broke
+        if (isBroke) {
+          toast.error("You don't have enough money to bet! Reset your balance to keep playing.");
+        }
       },
       
       addToHistory: (game, amount, result) => {
