@@ -1,0 +1,46 @@
+import { Suspense, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useAudio } from "./lib/stores/useAudio";
+import { useCasinoGame } from "./lib/stores/useCasinoGame";
+import Layout from "./components/Layout";
+import CasinoLobby from "./components/CasinoLobby";
+import BlackjackGame from "./components/Blackjack/BlackjackGame";
+import RoundTheBusGame from "./components/RoundTheBus/RoundTheBusGame";
+import SlotMachine from "./components/SlotMachine/SlotMachine";
+import NotFound from "./pages/not-found";
+import { initAudio } from "./lib/utils/audio";
+import { Toaster } from "./components/ui/sonner";
+
+function App() {
+  const { init } = useCasinoGame();
+  const { setBackgroundMusic } = useAudio();
+
+  useEffect(() => {
+    // Initialize casino game state
+    init();
+    
+    // Load and set up audio
+    initAudio().then(({ backgroundMusic }) => {
+      setBackgroundMusic(backgroundMusic);
+    });
+  }, [init, setBackgroundMusic]);
+
+  return (
+    <Router>
+      <Layout>
+        <Suspense fallback={<div className="h-screen w-full flex items-center justify-center">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<CasinoLobby />} />
+            <Route path="/blackjack" element={<BlackjackGame />} />
+            <Route path="/round-the-bus" element={<RoundTheBusGame />} />
+            <Route path="/slots" element={<SlotMachine />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </Layout>
+      <Toaster position="top-center" />
+    </Router>
+  );
+}
+
+export default App;

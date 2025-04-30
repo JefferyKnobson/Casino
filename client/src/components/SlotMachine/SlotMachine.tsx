@@ -1,0 +1,255 @@
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { useGameState } from "@/lib/stores/useGameState";
+import { useCasinoGame } from "@/lib/stores/useCasinoGame";
+import { useAudio } from "@/lib/stores/useAudio";
+import { playSound } from "@/lib/utils/audio";
+import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
+import { CasinoButton } from "../ui/button-casino";
+import Reel from "./Reel";
+import Chip from "../ui/chip";
+import CoinAnimation from "../ui/coin-animation";
+import { slotSymbolData } from "@/assets/svg/slot-symbols";
+
+const SlotMachine = () => {
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [animationAmount, setAnimationAmount] = useState(0);
+  const [spinning, setSpinning] = useState(false);
+  const { isMuted } = useAudio();
+  
+  const {
+    slotMachine,
+    initSlotMachine,
+    placeSlotBet,
+    spinSlotMachine,
+  } = useGameState();
+  
+  const { balance, updateBalance, addToHistory } = useCasinoGame();
+  
+  // Initialize the game when component mounts
+  useEffect(() => {
+    initSlotMachine();
+  }, [initSlotMachine]);
+  
+  // Handle placing a bet
+  const handlePlaceBet = (amount: number) => {
+    if (amount > balance) {
+      toast.error("Not enough balance");
+      return;
+    }
+    
+    if (!isMuted) {
+      playSound("bet");
+    }
+    
+    placeSlotBet(amount);
+  };
+  
+  // Handle spinning the reels
+  const handleSpin = async () => {
+    if (spinning || !slotMachine.bet) return;
+    
+    setSpinning(true);
+    
+    if (!isMuted) {
+      playSound("spin");
+    }
+    
+    try {
+      const result = await spinSlotMachine();
+      
+      // Update balance and game history
+      updateBalance(result.winAmount - slotMachine.bet);
+      
+      // Play appropriate sound
+      if (!isMuted) {
+        if (result.winAmount > 0) {
+          playSound("win");
+        } else {
+          playSound("loss");
+        }
+      }
+      
+      // Record in history
+      const gameResult = result.winAmount > 0 ? "win" : "loss";
+      addToHistory("slots", result.winAmount - slotMachine.bet, gameResult);
+      
+      // Show win animation and toast
+      if (result.winAmount > 0) {
+        setAnimationAmount(result.winAmount);
+        setShowAnimation(true);
+        toast.success(`You won $${result.winAmount}!`);
+      } else {
+        toast.error("Better luck next time!");
+      }
+    } catch (error) {
+      console.error("Error spinning:", error);
+      toast.error("Something went wrong while spinning");
+    } finally {
+      setSpinning(false);
+    }
+  };
+  
+  // Render betting controls
+  const renderBettingControls = () => (
+    <div className="flex flex-col items-center mt-6">
+      <h3 className="font-bold mb-3">Select Bet</h3>
+      
+      <div className="flex flex-wrap justify-center gap-3 mb-4">
+        {[5, 10, 25, 50, 100].map(value => (
+          <Chip
+            key={value}
+            value={value as any}
+            size="md"
+            onClick={() => handlePlaceBet(value)}
+            disabled={spinning || value > balance}
+            className={slotMachine.bet === value ? "ring-2 ring-offset-2 ring-primary" : ""}
+          />
+        ))}
+      </div>
+      
+      <CasinoButton
+        variant="red"
+        size="xl"
+        onClick={handleSpin}
+        disabled={spinning || !slotMachine.bet}
+        className="mt-2 w-full max-w-xs"
+      >
+        {spinning ? "Spinning..." : "SPIN"}
+      </CasinoButton>
+    </div>
+  );
+  
+  // Render the paytable
+  const renderPaytable = () => (
+    <div className="mt-8 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
+      <h3 className="font-bold text-center mb-3">Paytable</h3>
+      
+      <div className="grid grid-cols-2 gap-2">
+        {slotSymbolData.map(symbol => (
+          <div key={symbol.id} className="flex items-center text-sm">
+            <div className="mr-2 text-2xl">{symbol.emoji}</div>
+            <div className="flex-1">
+              <div className="font-medium">{symbol.name}</div>
+              <div className="text-xs">
+                <span className="text-green-600 font-bold">{symbol.payout}x</span> (3 matching)
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-4 text-xs text-center text-slate-600 dark:text-slate-400">
+        Matching 2 symbols pays 2x your bet.
+      </div>
+    </div>
+  );
+  
+  // Get the currently visible symbols
+  const getVisibleSymbols = () => {
+    if (slotMachine.lastResult) {
+      return slotMachine.lastResult.symbols;
+    }
+    
+    // Default symbols if no result yet
+    return ["🍒", "🍋", "7️⃣"];
+  };
+  
+  return (
+    <div className="max-w-4xl mx-auto pt-6">
+      <CasinoCard gradient="red" bordered className="mb-6">
+        <CasinoCardHeader>
+          <CasinoCardTitle>Slot Machine</CasinoCardTitle>
+        </CasinoCardHeader>
+        <CasinoCardContent>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p>Place your bet and try your luck! Match symbols across the payline to win.</p>
+            <p>Three matching symbols pay the biggest prizes. Two matching symbols from left to right pay smaller wins.</p>
+          </div>
+        </CasinoCardContent>
+      </CasinoCard>
+      
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+        {/* Slot machine top */}
+        <div className="bg-gradient-to-r from-amber-700 to-amber-900 p-3 text-amber-100 flex justify-between items-center">
+          <div className="font-bold">
+            Balance: ${balance}
+          </div>
+          {slotMachine.bet > 0 && (
+            <div>
+              Bet: ${slotMachine.bet}
+            </div>
+          )}
+          {slotMachine.lastResult?.winAmount ? (
+            <div className="font-bold text-amber-200">
+              Win: ${slotMachine.lastResult.winAmount}
+            </div>
+          ) : (
+            <div>Win: $0</div>
+          )}
+        </div>
+        
+        {/* Slot machine body */}
+        <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-8">
+          {/* Reels container */}
+          <div className="relative mb-8">
+            {/* Reels */}
+            <div className="flex justify-center gap-3 mb-2">
+              {slotMachine.reels.map((reel, index) => (
+                <Reel
+                  key={index}
+                  spinning={spinning}
+                  symbol={getVisibleSymbols()[index]}
+                  delay={index * 0.5}
+                  isWinning={
+                    slotMachine.lastResult?.winLines.includes(0) &&
+                    !spinning
+                  }
+                />
+              ))}
+            </div>
+            
+            {/* Payline */}
+            <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 border-2 border-amber-500 z-10 opacity-50"></div>
+            
+            {/* Win markers */}
+            {slotMachine.lastResult?.winLines.includes(0) && !spinning && (
+              <>
+                <motion.div 
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                />
+                <motion.div 
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                />
+              </>
+            )}
+          </div>
+          
+          {/* Controls */}
+          {renderBettingControls()}
+        </div>
+        
+        {/* Paytable */}
+        <div className="p-4">
+          {renderPaytable()}
+        </div>
+      </div>
+      
+      {/* Coin animation */}
+      {showAnimation && (
+        <CoinAnimation 
+          amount={animationAmount} 
+          isWinning={true}
+          onComplete={() => setShowAnimation(false)} 
+        />
+      )}
+    </div>
+  );
+};
+
+export default SlotMachine;
