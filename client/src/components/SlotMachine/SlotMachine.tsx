@@ -121,28 +121,33 @@ const SlotMachine = () => {
     </div>
   );
   
-  // Render the paytable
+  // Render the paytable - formatted to match the image
   const renderPaytable = () => (
-    <div className="mt-8 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
-      <h3 className="font-bold text-center mb-3">Paytable</h3>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-        {slotSymbolData.map(symbol => (
-          <div key={symbol.id} className="flex items-center text-sm">
-            <div className="mr-2 text-2xl">{symbol.emoji}</div>
-            <div className="flex-1">
-              <div className="font-medium">{symbol.name}</div>
-              <div className="text-xs">
-                <span className="text-green-600 font-bold">{symbol.payout}x</span> (3 matching)
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="mt-4 text-xs text-center text-slate-600 dark:text-slate-400">
-        <p>Matching 2 left symbols pays 4x your bet.</p>
-        <p>Matching 2 right symbols pays 3x your bet.</p>
+    <div className="mt-8 p-4 bg-black text-white rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-lg">3 FRUIT:</span>
+          <span className="text-xl">🍋 🍉 🍒</span>
+          <span className="text-yellow-400 font-bold ml-auto">2x</span>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-lg">SAME FRUIT:</span>
+          <span className="text-xl">🍇 🍇 🍇</span>
+          <span className="text-yellow-400 font-bold ml-auto">10x</span>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-lg">3 BELLS:</span>
+          <span className="text-xl">🔔 🔔 🔔</span>
+          <span className="text-yellow-400 font-bold ml-auto">25x</span>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-lg">3 SEVENS:</span>
+          <span className="text-xl text-red-600 font-bold">7 7 7</span>
+          <span className="text-yellow-400 font-bold ml-auto">100x</span>
+        </div>
       </div>
     </div>
   );
