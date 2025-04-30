@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import CasinoHeader from "./common/CasinoHeader";
+import StuckButton from "./common/StuckButton";
 import { useAudio } from "@/lib/stores/useAudio";
 import { playSound } from "@/lib/utils/audio";
 
@@ -56,6 +57,9 @@ const Layout = ({ children }: LayoutProps) => {
       <footer className="w-full py-2 border-t border-primary/20 text-center text-sm text-muted-foreground">
         <p>Casino Desperado &copy; {new Date().getFullYear()}</p>
       </footer>
+      
+      {/* "I'm Stuck" button */}
+      <StuckButton />
     </div>
   );
 };

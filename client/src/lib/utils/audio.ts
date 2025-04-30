@@ -1,6 +1,6 @@
 // Audio utilities for the casino game
 
-type AudioType = "background" | "win" | "loss" | "hit" | "cash" | "deal" | "bet" | "spin";
+type AudioType = "background" | "win" | "loss" | "hit" | "cash" | "deal" | "bet" | "spin" | "gameOver";
 
 interface AudioFiles {
   backgroundMusic: HTMLAudioElement;
@@ -12,6 +12,7 @@ interface AudioFiles {
   betSound: HTMLAudioElement;
   winSound: HTMLAudioElement;
   lossSound: HTMLAudioElement;
+  gameOverSound: HTMLAudioElement;
 }
 
 let audioFiles: AudioFiles | null = null;
