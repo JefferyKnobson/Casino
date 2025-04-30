@@ -20,38 +20,43 @@ const GameControls = ({
   canSplit = false,
 }: GameControlsProps) => {
   return (
-    <div className="mt-8 flex flex-wrap justify-center gap-4">
+    <div className="mt-4 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-4">
       <CasinoButton
         variant="green"
-        size="lg"
+        size="md"
         onClick={onHit}
         disabled={disableControls}
+        className="min-w-[80px] sm:min-w-0"
       >
         Hit
       </CasinoButton>
       
       <CasinoButton
         variant="red"
-        size="lg"
+        size="md"
         onClick={onStand}
+        className="min-w-[80px] sm:min-w-0"
       >
         Stand
       </CasinoButton>
       
       <CasinoButton
         variant="blue"
-        size="lg"
+        size="md"
         onClick={onDoubleDown}
         disabled={!canDoubleDown || disableControls}
+        className="min-w-[80px] sm:min-w-0"
       >
-        Double Down
+        <span className="hidden sm:inline">Double Down</span>
+        <span className="sm:hidden">Double</span>
       </CasinoButton>
       
       <CasinoButton
         variant="purple"
-        size="lg"
+        size="md"
         onClick={onSplit}
         disabled={!canSplit || disableControls}
+        className="min-w-[80px] sm:min-w-0"
       >
         Split
       </CasinoButton>

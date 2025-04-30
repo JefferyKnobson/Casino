@@ -23,6 +23,7 @@ const casinoButtonVariants = cva(
       size: {
         default: "h-10 py-2 px-4",
         sm: "h-9 px-3 rounded-md",
+        md: "h-10 px-5 rounded-md text-sm",
         lg: "h-11 px-8 rounded-md",
         xl: "h-12 px-10 rounded-md text-base",
         icon: "h-10 w-10",
