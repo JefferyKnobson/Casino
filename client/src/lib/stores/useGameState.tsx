@@ -103,9 +103,9 @@ const initialRoundTheBusState: RoundTheBusState = {
 
 const initialSlotMachineState: SlotMachineState = {
   reels: [
-    ["🍒", "🍋", "🍊", "🍇", "💎", "7️⃣", "🍀", "🔔"],
-    ["🍒", "🍋", "🍊", "🍇", "💎", "7️⃣", "🍀", "🔔"],
-    ["🍒", "🍋", "🍊", "🍇", "💎", "7️⃣", "🍀", "🔔"],
+    ["🍒", "🍋", "🍉", "🍇", "7️⃣", "🔔", "🍀"],
+    ["🍒", "🍋", "🍉", "🍇", "7️⃣", "🔔", "🍀"],
+    ["🍒", "🍋", "🍉", "🍇", "7️⃣", "🔔", "🍀"],
   ],
   spinning: false,
   bet: 0,
@@ -699,22 +699,31 @@ function calculateSlotWinnings(symbols: string[], bet: number): { winAmount: num
   const winLines: number[] = [];
   let multiplier = 0;
   
+  // Extract emoji symbols for easier comparison
+  const normalizedSymbols = symbols.map(s => {
+    if (s === "7️⃣") return "seven";
+    if (s === "🔔") return "bell";
+    if (s === "🍒") return "cherry";
+    if (s === "🍋") return "lemon";
+    if (s === "🍇") return "grape";
+    if (s === "🍉") return "watermelon";
+    return s;
+  });
+  
   // Check for 3 sevens (jackpot - 100x)
-  if (symbols.every(symbol => symbol === "seven")) {
+  if (symbols.every(symbol => symbol === "7️⃣")) {
     winLines.push(0);
     multiplier = 100; // 3 sevens pays 100x
   }
   // Check for 3 bells (25x)
-  else if (symbols.every(symbol => symbol === "bell")) {
+  else if (symbols.every(symbol => symbol === "🔔")) {
     winLines.push(0);
     multiplier = 25; // 3 bells pays 25x
   }
   // Check for 3 identical fruits (10x)
   else if (
-    symbols.every(symbol => symbol === "cherry") ||
-    symbols.every(symbol => symbol === "lemon") ||
-    symbols.every(symbol => symbol === "orange") ||
-    symbols.every(symbol => symbol === "grape")
+    (symbols[0] === symbols[1] && symbols[1] === symbols[2]) && 
+    (symbols[0] === "🍒" || symbols[0] === "🍋" || symbols[0] === "🍇" || symbols[0] === "🍉")
   ) {
     winLines.push(0);
     multiplier = 10; // Same fruit pays 10x
@@ -722,44 +731,14 @@ function calculateSlotWinnings(symbols: string[], bet: number): { winAmount: num
   // Check for any 3 different fruits (2x)
   else if (
     symbols.every(symbol => 
-      symbol === "cherry" || 
-      symbol === "lemon" || 
-      symbol === "orange" || 
-      symbol === "grape"
-    ) && 
-    symbols[0] !== symbols[1] && 
-    symbols[1] !== symbols[2] && 
-    symbols[0] !== symbols[2]
+      symbol === "🍒" || 
+      symbol === "🍋" || 
+      symbol === "🍇" || 
+      symbol === "🍉"
+    )
   ) {
     winLines.push(0);
-    multiplier = 2; // Any 3 different fruits pays 2x
-  }
-  // Check for 2 sevens (4x)
-  else if (
-    (symbols[0] === "seven" && symbols[1] === "seven") ||
-    (symbols[1] === "seven" && symbols[2] === "seven") ||
-    (symbols[0] === "seven" && symbols[2] === "seven")
-  ) {
-    winLines.push(0);
-    multiplier = 4; // 2 sevens pays 4x
-  }
-  // Check for 2 bells (3x)
-  else if (
-    (symbols[0] === "bell" && symbols[1] === "bell") ||
-    (symbols[1] === "bell" && symbols[2] === "bell") ||
-    (symbols[0] === "bell" && symbols[2] === "bell")
-  ) {
-    winLines.push(0);
-    multiplier = 3; // 2 bells pays 3x
-  }
-  // Check for any pair of matching symbols (2x)
-  else if (
-    symbols[0] === symbols[1] ||
-    symbols[1] === symbols[2] ||
-    symbols[0] === symbols[2]
-  ) {
-    winLines.push(0);
-    multiplier = 2; // Any matching pair pays 2x
+    multiplier = 2; // Any 3 fruits pays 2x
   }
   
   const winAmount = bet * multiplier;
