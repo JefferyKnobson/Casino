@@ -24,7 +24,7 @@ const RoundTheBusGame = () => {
     resetRoundTheBus,
   } = useGameState();
   
-  const { balance, updateBalance, addToHistory } = useCasinoGame();
+  const { balance, isBroke, updateBalance, addToHistory, resetBalance } = useCasinoGame();
   
   // Initialize the game when component mounts
   useEffect(() => {
@@ -158,18 +158,37 @@ const RoundTheBusGame = () => {
       </CasinoCard>
       
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 border border-slate-200 dark:border-slate-800">
-        {/* Game Board */}
-        {roundTheBus.currentCard && (
-          <GameBoard 
-            pyramid={roundTheBus.pyramid}
-            currentCard={roundTheBus.currentCard}
-            currentLevel={roundTheBus.currentLevel}
-            bet={roundTheBus.bet}
-          />
+        {/* Show out of money message when broke */}
+        {isBroke && roundTheBus.gamePhase === "betting" && (
+          <div className="text-center py-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
+            <CasinoButton
+              variant="green"
+              onClick={resetBalance}
+            >
+              Reset Balance to $250
+            </CasinoButton>
+          </div>
         )}
         
-        {/* Game Controls */}
-        {roundTheBus.gamePhase === "betting" && renderBettingPhase()}
+        {/* Only show game elements if not broke or if game is in progress */}
+        {(!isBroke || roundTheBus.gamePhase !== "betting") && (
+          <>
+            {/* Game Board */}
+            {roundTheBus.currentCard && (
+              <GameBoard 
+                pyramid={roundTheBus.pyramid}
+                currentCard={roundTheBus.currentCard}
+                currentLevel={roundTheBus.currentLevel}
+                bet={roundTheBus.bet}
+              />
+            )}
+            
+            {/* Game Controls */}
+            {roundTheBus.gamePhase === "betting" && renderBettingPhase()}
+          </>
+        )}
         
         {roundTheBus.gamePhase === "playing" && (
           <div className="mt-8 flex justify-center gap-6">

@@ -25,7 +25,7 @@ const SlotMachine = () => {
     spinSlotMachine,
   } = useGameState();
   
-  const { balance, updateBalance, addToHistory } = useCasinoGame();
+  const { balance, isBroke, updateBalance, addToHistory, resetBalance } = useCasinoGame();
   
   // Initialize the game when component mounts
   useEffect(() => {
@@ -198,46 +198,65 @@ const SlotMachine = () => {
         
         {/* Slot machine body */}
         <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-8">
-          {/* Reels container */}
-          <div className="relative mb-8">
-            {/* Reels */}
-            <div className="flex justify-center gap-3 mb-2">
-              {slotMachine.reels.map((reel, index) => (
-                <Reel
-                  key={index}
-                  spinning={spinning}
-                  symbol={getVisibleSymbols()[index]}
-                  delay={index * 0.5}
-                  isWinning={
-                    slotMachine.lastResult?.winLines.includes(0) &&
-                    !spinning
-                  }
-                />
-              ))}
+          {/* Show out of money message when broke */}
+          {isBroke && !slotMachine.bet && (
+            <div className="text-center py-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-4">You're out of money!</h2>
+              <p className="mb-6 text-gray-300">Reset your balance to continue playing.</p>
+              <CasinoButton
+                variant="red"
+                onClick={resetBalance}
+              >
+                Reset Balance to $250
+              </CasinoButton>
             </div>
-            
-            {/* Payline */}
-            <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 border-2 border-amber-500 z-10 opacity-50"></div>
-            
-            {/* Win markers */}
-            {slotMachine.lastResult?.winLines.includes(0) && !spinning && (
-              <>
-                <motion.div 
-                  className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
-                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                />
-                <motion.div 
-                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
-                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                />
-              </>
-            )}
-          </div>
+          )}
           
-          {/* Controls */}
-          {renderBettingControls()}
+          {/* Only show game elements if not broke or if game has a bet */}
+          {(!isBroke || slotMachine.bet > 0) && (
+            <>
+              {/* Reels container */}
+              <div className="relative mb-8">
+                {/* Reels */}
+                <div className="flex justify-center gap-3 mb-2">
+                  {slotMachine.reels.map((reel, index) => (
+                    <Reel
+                      key={index}
+                      spinning={spinning}
+                      symbol={getVisibleSymbols()[index]}
+                      delay={index * 0.5}
+                      isWinning={
+                        slotMachine.lastResult?.winLines.includes(0) &&
+                        !spinning
+                      }
+                    />
+                  ))}
+                </div>
+                
+                {/* Payline */}
+                <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 border-2 border-amber-500 z-10 opacity-50"></div>
+                
+                {/* Win markers */}
+                {slotMachine.lastResult?.winLines.includes(0) && !spinning && (
+                  <>
+                    <motion.div 
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                    <motion.div 
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                  </>
+                )}
+              </div>
+              
+              {/* Controls */}
+              {renderBettingControls()}
+            </>
+          )}
         </div>
         
         {/* Paytable */}

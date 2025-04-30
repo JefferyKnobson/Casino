@@ -25,7 +25,7 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
       case 1: return 2;   // Round 1: x2
       case 2: return 5;   // Round 2: x5
       case 3: return 10;  // Round 3: x10
-      case 4: return 20;  // Round 4: x20 (not implemented in UI)
+      case 4: return 20;  // Round 4: x20
       default: return 0;  // No completed rounds
     }
   };
@@ -66,6 +66,7 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
         <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 1: 2x</div>
         <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 2: 5x</div>
         <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 3: 10x</div>
+        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 4: 20x</div>
       </div>
       
       {/* Current card and pyramid together in a more compact layout */}
