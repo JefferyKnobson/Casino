@@ -48,8 +48,10 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <CasinoHeader isMuted={isMuted} onToggleSound={handleToggleSound} />
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 pb-8 overflow-y-auto">
-        {children}
+      <main className="flex-1 w-full max-w-full sm:max-w-7xl mx-auto px-2 sm:px-4 pb-8 overflow-x-hidden overflow-y-auto">
+        <div className="w-full h-full">
+          {children}
+        </div>
       </main>
       <footer className="w-full py-2 border-t border-primary/20 text-center text-sm text-muted-foreground">
         <p>Casino Desperado &copy; {new Date().getFullYear()}</p>

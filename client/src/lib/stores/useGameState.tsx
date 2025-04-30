@@ -705,21 +705,26 @@ function calculateSlotWinnings(symbols: string[], bet: number): { winAmount: num
     
     // Assign multipliers based on symbol
     switch (symbols[0]) {
-      case "7️⃣": multiplier = 100; break;
-      case "💎": multiplier = 50; break;
-      case "🍀": multiplier = 25; break;
-      case "🔔": multiplier = 15; break;
-      case "🍇": multiplier = 10; break;
-      case "🍊": multiplier = 8; break;
-      case "🍋": multiplier = 5; break;
-      case "🍒": multiplier = 3; break;
-      default: multiplier = 2;
+      case "7️⃣": multiplier = 200; break;
+      case "💎": multiplier = 100; break;
+      case "🍀": multiplier = 50; break;
+      case "🔔": multiplier = 30; break;
+      case "🍇": multiplier = 20; break;
+      case "🍊": multiplier = 15; break;
+      case "🍋": multiplier = 10; break;
+      case "🍒": multiplier = 7; break;
+      default: multiplier = 5;
     }
   } 
   // Check for pairs (only leftmost two matching)
   else if (symbols[0] === symbols[1]) {
     winLines.push(0);
-    multiplier = 2;
+    multiplier = 4; // Increased from 2 to 4 for pairs
+  }
+  // Check for any pair (even if not leftmost)
+  else if (symbols[1] === symbols[2]) {
+    winLines.push(0);
+    multiplier = 3; // Added new win condition for rightmost pairs
   }
   
   const winAmount = bet * multiplier;

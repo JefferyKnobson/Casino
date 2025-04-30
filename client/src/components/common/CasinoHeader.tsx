@@ -27,15 +27,53 @@ const CasinoHeader = ({ isMuted, onToggleSound }: CasinoHeaderProps) => {
   };
   
   return (
-    <header className="w-full bg-primary text-primary-foreground py-4 px-4 sm:px-8 sticky top-0 z-10 shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-2 sm:space-x-4">
+    <header className="w-full bg-primary text-primary-foreground py-3 px-2 sm:px-8 sticky top-0 z-10 shadow-md">
+      <div className="max-w-full sm:max-w-7xl mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-1 sm:space-x-4">
           <Link to="/" className="flex items-center">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight truncate max-w-[120px] sm:max-w-none">
               Casino Desperado
             </h1>
           </Link>
           
+          {/* Mobile navigation */}
+          <div className="flex sm:hidden items-center ml-2 space-x-1">
+            <Link 
+              to="/blackjack" 
+              className={cn(
+                "px-2 py-1 rounded-md text-xs font-medium transition-colors",
+                isActive('/blackjack') 
+                  ? "bg-primary-foreground/20 text-white" 
+                  : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-white"
+              )}
+            >
+              21
+            </Link>
+            <Link 
+              to="/round-the-bus" 
+              className={cn(
+                "px-2 py-1 rounded-md text-xs font-medium transition-colors",
+                isActive('/round-the-bus') 
+                  ? "bg-primary-foreground/20 text-white" 
+                  : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-white"
+              )}
+            >
+              RTB
+            </Link>
+            <Link 
+              to="/slots" 
+              className={cn(
+                "px-2 py-1 rounded-md text-xs font-medium transition-colors",
+                isActive('/slots') 
+                  ? "bg-primary-foreground/20 text-white" 
+                  : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-white"
+              )}
+            >
+              Slots
+            </Link>
+          </div>
+          
+          {/* Desktop navigation */}
           <nav className="hidden sm:flex items-center ml-6 space-x-1">
             <Link 
               to="/" 
@@ -84,10 +122,10 @@ const CasinoHeader = ({ isMuted, onToggleSound }: CasinoHeaderProps) => {
           </nav>
         </div>
         
-        <div className="flex items-center space-x-2 sm:space-x-4">
-          <div className="flex items-center bg-primary-foreground/10 rounded-md px-3 py-1.5">
-            <User size={16} className="mr-2" />
-            <span className="font-semibold text-sm sm:text-base">
+        <div className="flex items-center space-x-1 sm:space-x-4">
+          <div className="flex items-center bg-primary-foreground/10 rounded-md px-2 sm:px-3 py-1.5">
+            <User size={14} className="mr-1 sm:mr-2" />
+            <span className="font-semibold text-xs sm:text-base whitespace-nowrap">
               {formatCurrency(balance)}
             </span>
           </div>
@@ -97,18 +135,18 @@ const CasinoHeader = ({ isMuted, onToggleSound }: CasinoHeaderProps) => {
             size="icon"
             onClick={onToggleSound}
             title={isMuted ? "Unmute" : "Mute"}
-            className="text-primary-foreground hover:bg-primary-foreground/20"
+            className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground hover:bg-primary-foreground/20"
           >
-            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            {isMuted ? <VolumeX size={16} className="sm:w-5 sm:h-5" /> : <Volume2 size={16} className="sm:w-5 sm:h-5" />}
           </Button>
           
           <Link to="/" className="sm:hidden">
             <Button 
               variant="ghost" 
               size="icon"
-              className="text-primary-foreground hover:bg-primary-foreground/20"
+              className="w-8 h-8 text-primary-foreground hover:bg-primary-foreground/20"
             >
-              <Home size={20} />
+              <Home size={16} />
             </Button>
           </Link>
         </div>

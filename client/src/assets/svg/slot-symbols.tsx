@@ -102,12 +102,12 @@ export const getSymbolEmoji = (symbolId: string): string => {
 
 // Slot symbol data with payout information
 export const slotSymbolData = [
-  { id: "seven", emoji: "7️⃣", name: "Seven", payout: 100, rarity: 1 },
-  { id: "diamond", emoji: "💎", name: "Diamond", payout: 50, rarity: 2 },
-  { id: "clover", emoji: "🍀", name: "Clover", payout: 25, rarity: 3 },
-  { id: "bell", emoji: "🔔", name: "Bell", payout: 15, rarity: 4 },
-  { id: "grape", emoji: "🍇", name: "Grape", payout: 10, rarity: 6 },
-  { id: "orange", emoji: "🍊", name: "Orange", payout: 8, rarity: 8 },
-  { id: "lemon", emoji: "🍋", name: "Lemon", payout: 5, rarity: 10 },
-  { id: "cherry", emoji: "🍒", name: "Cherry", payout: 3, rarity: 12 },
+  { id: "seven", emoji: "7️⃣", name: "Seven", payout: 200, rarity: 1 },
+  { id: "diamond", emoji: "💎", name: "Diamond", payout: 100, rarity: 2 },
+  { id: "clover", emoji: "🍀", name: "Clover", payout: 50, rarity: 3 },
+  { id: "bell", emoji: "🔔", name: "Bell", payout: 30, rarity: 4 },
+  { id: "grape", emoji: "🍇", name: "Grape", payout: 20, rarity: 6 },
+  { id: "orange", emoji: "🍊", name: "Orange", payout: 15, rarity: 8 },
+  { id: "lemon", emoji: "🍋", name: "Lemon", payout: 10, rarity: 10 },
+  { id: "cherry", emoji: "🍒", name: "Cherry", payout: 7, rarity: 12 },
 ];

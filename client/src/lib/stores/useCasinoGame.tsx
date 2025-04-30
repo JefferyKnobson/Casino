@@ -24,7 +24,7 @@ interface CasinoGameState {
 export const useCasinoGame = create<CasinoGameState>()(
   persist(
     (set, get) => ({
-      balance: 1000, // Starting balance
+      balance: 250, // Starting balance
       activeGame: null,
       gameHistory: [],
       
@@ -54,7 +54,7 @@ export const useCasinoGame = create<CasinoGameState>()(
       },
       
       resetBalance: () => {
-        set({ balance: 1000 });
+        set({ balance: 250 });
       }
     }),
     {

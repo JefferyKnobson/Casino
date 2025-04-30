@@ -126,7 +126,7 @@ const SlotMachine = () => {
     <div className="mt-8 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
       <h3 className="font-bold text-center mb-3">Paytable</h3>
       
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         {slotSymbolData.map(symbol => (
           <div key={symbol.id} className="flex items-center text-sm">
             <div className="mr-2 text-2xl">{symbol.emoji}</div>
@@ -141,7 +141,8 @@ const SlotMachine = () => {
       </div>
       
       <div className="mt-4 text-xs text-center text-slate-600 dark:text-slate-400">
-        Matching 2 symbols pays 2x your bet.
+        <p>Matching 2 left symbols pays 4x your bet.</p>
+        <p>Matching 2 right symbols pays 3x your bet.</p>
       </div>
     </div>
   );
