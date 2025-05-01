@@ -497,12 +497,214 @@ export const useGameState = create<GameState>((set, get) => {
     });
   },
   
-  chooseHigher: function() {
-    return playRoundTheBusTurn.call(this, "higher");
+  chooseHigher: () => {
+    const state = get();
+    const { roundTheBus } = state;
+    const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
+    
+    if (!currentCard || roundTheBus.gamePhase !== "playing") {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (for higher)
+    const correct = nextCard.value > currentCard.value;
+    
+    // If cards are equal, the player loses
+    if (nextCard.value === currentCard.value) {
+      // Game over - incorrect guess
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          gamePhase: "finished",
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "same" 
+          }]
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Update progress based on current level
+      let nextLevel = currentLevel;
+      let nextPhase = "playing";
+      const updatedPyramid = [...pyramid];
+      
+      // Handle successful guess
+      if (currentLevel === 0) {
+        // First level (3 cards)
+        const emptySlotIndex = updatedPyramid[0].findIndex(card => card === null);
+        if (emptySlotIndex !== -1) {
+          updatedPyramid[0][emptySlotIndex] = nextCard;
+          // If this was the last card in the level, move to the next level
+          if (updatedPyramid[0].every(card => card !== null)) {
+            nextLevel = 1;
+          }
+        }
+      } else if (currentLevel === 1) {
+        // Second level (2 cards)
+        const emptySlotIndex = updatedPyramid[1].findIndex(card => card === null);
+        if (emptySlotIndex !== -1) {
+          updatedPyramid[1][emptySlotIndex] = nextCard;
+          // If this was the last card in the level, move to the next level
+          if (updatedPyramid[1].every(card => card !== null)) {
+            nextLevel = 2;
+          }
+        }
+      } else if (currentLevel === 2) {
+        // Third level (1 card)
+        updatedPyramid[2][0] = nextCard;
+        // Game completed successfully
+        nextPhase = "finished";
+      }
+      
+      // Update state with success
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          pyramid: updatedPyramid,
+          currentCard: nextCard,
+          currentLevel: nextLevel,
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "higher" 
+          }],
+          gamePhase: nextPhase
+        }
+      });
+      
+      return true;
+    } else {
+      // Incorrect guess, game over
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "higher" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
   },
   
-  chooseLower: function() {
-    return playRoundTheBusTurn.call(this, "lower");
+  chooseLower: () => {
+    const state = get();
+    const { roundTheBus } = state;
+    const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
+    
+    if (!currentCard || roundTheBus.gamePhase !== "playing") {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (for lower)
+    const correct = nextCard.value < currentCard.value;
+    
+    // If cards are equal, the player loses
+    if (nextCard.value === currentCard.value) {
+      // Game over - incorrect guess
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          gamePhase: "finished",
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "same" 
+          }]
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Update progress based on current level
+      let nextLevel = currentLevel;
+      let nextPhase = "playing";
+      const updatedPyramid = [...pyramid];
+      
+      // Handle successful guess
+      if (currentLevel === 0) {
+        // First level (3 cards)
+        const emptySlotIndex = updatedPyramid[0].findIndex(card => card === null);
+        if (emptySlotIndex !== -1) {
+          updatedPyramid[0][emptySlotIndex] = nextCard;
+          // If this was the last card in the level, move to the next level
+          if (updatedPyramid[0].every(card => card !== null)) {
+            nextLevel = 1;
+          }
+        }
+      } else if (currentLevel === 1) {
+        // Second level (2 cards)
+        const emptySlotIndex = updatedPyramid[1].findIndex(card => card === null);
+        if (emptySlotIndex !== -1) {
+          updatedPyramid[1][emptySlotIndex] = nextCard;
+          // If this was the last card in the level, move to the next level
+          if (updatedPyramid[1].every(card => card !== null)) {
+            nextLevel = 2;
+          }
+        }
+      } else if (currentLevel === 2) {
+        // Third level (1 card)
+        updatedPyramid[2][0] = nextCard;
+        // Game completed successfully
+        nextPhase = "finished";
+      }
+      
+      // Update state with success
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          pyramid: updatedPyramid,
+          currentCard: nextCard,
+          currentLevel: nextLevel,
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "lower" 
+          }],
+          gamePhase: nextPhase
+        }
+      });
+      
+      return true;
+    } else {
+      // Incorrect guess, game over
+      set({
+        roundTheBus: {
+          ...roundTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...roundTheBus.history, { 
+            card: nextCard, 
+            result: "lower" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
   },
   
   resetRoundTheBus: () => {
@@ -530,11 +732,11 @@ export const useGameState = create<GameState>((set, get) => {
     }));
   },
   
-  spinSlotMachine: async function() {
-    const state = this.getState();
+  spinSlotMachine: async () => {
+    const state = get();
     const { slotMachine } = state;
     
-    this.setState({
+    set({
       slotMachine: {
         ...slotMachine,
         spinning: true,
@@ -557,7 +759,7 @@ export const useGameState = create<GameState>((set, get) => {
     const result = { symbols, winAmount, winLines };
     
     // Update state with result
-    this.setState({
+    set({
       slotMachine: {
         ...slotMachine,
         spinning: false,

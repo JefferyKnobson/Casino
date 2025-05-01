@@ -87,8 +87,8 @@ const CasinoLobby = () => {
           </CasinoCardHeader>
           <CasinoCardContent className="flex-1 p-4 sm:p-6">
             <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm sm:text-base">
-              Test your luck by guessing if the next card will be higher or lower than the current one.
-              Complete the pyramid to win big!
+              Guess if the next card will be higher or lower than the current one.
+              Complete all rounds to win up to 10x your bet!
             </p>
             <div className="flex justify-center my-3 sm:my-4">
               <div className="flex flex-col items-center space-y-1">
