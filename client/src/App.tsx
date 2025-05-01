@@ -12,6 +12,21 @@ import NotFound from "./pages/not-found";
 import { initAudio } from "./lib/utils/audio";
 import { Toaster } from "./components/ui/sonner";
 
+// Game wrapper component to add HUD to all game routes
+// This needs to be outside App so it can use useLocation hook properly
+const GameRouteWrapper = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  // Only show GameHUD on game routes, not on home/lobby
+  const showHUD = location.pathname !== '/';
+  
+  return (
+    <>
+      {children}
+      {showHUD && <GameHUD />}
+    </>
+  );
+};
+
 function App() {
   const { init } = useCasinoGame();
   const { 
@@ -46,17 +61,33 @@ function App() {
     setLoseSound, 
     setGameOverSound
   ]);
-
+  
   return (
     <Router>
       <Layout>
         <Suspense fallback={<div className="h-screen w-full flex items-center justify-center">Loading...</div>}>
           <Routes>
             <Route path="/" element={<CasinoLobby />} />
-            <Route path="/blackjack" element={<BlackjackGame />} />
-            <Route path="/ride-the-bus" element={<RideTheBusGame />} />
-            <Route path="/round-the-bus" element={<RideTheBusGame />} />  {/* Keep old route for backwards compatibility */}
-            <Route path="/slots" element={<SlotMachine />} />
+            <Route path="/blackjack" element={
+              <GameRouteWrapper>
+                <BlackjackGame />
+              </GameRouteWrapper>
+            } />
+            <Route path="/ride-the-bus" element={
+              <GameRouteWrapper>
+                <RideTheBusGame />
+              </GameRouteWrapper>
+            } />
+            <Route path="/round-the-bus" element={
+              <GameRouteWrapper>
+                <RideTheBusGame />
+              </GameRouteWrapper>
+            } />
+            <Route path="/slots" element={
+              <GameRouteWrapper>
+                <SlotMachine />
+              </GameRouteWrapper>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
