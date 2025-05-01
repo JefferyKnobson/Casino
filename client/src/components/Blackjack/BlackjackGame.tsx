@@ -405,35 +405,48 @@ const BlackjackGame = () => {
         </CasinoCardContent>
       </CasinoCard>
       
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-3 sm:p-6 border border-slate-200 dark:border-slate-800">
-        {/* Show out of money message when broke */}
-        {isBroke && blackjack.gamePhase === "betting" && (
-          <div className="text-center py-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
-            <CasinoButton
-              variant="gold"
-              onClick={resetBalance}
-            >
-              Reset Balance to $250
-            </CasinoButton>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="game" className="text-base">Game</TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="game" className="mt-0">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-3 sm:p-6 border border-slate-200 dark:border-slate-800">
+            {/* Show out of money message when broke */}
+            {isBroke && blackjack.gamePhase === "betting" && (
+              <div className="text-center py-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
+                <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
+                <CasinoButton
+                  variant="gold"
+                  onClick={resetBalance}
+                >
+                  Reset Balance to $250
+                </CasinoButton>
+              </div>
+            )}
+          
+            {/* Only show game elements if not broke or if game is in progress */}
+            {(!isBroke || blackjack.gamePhase !== "betting") && (
+              <>
+                {/* Dealer's Hand */}
+                {blackjack.dealerHand.length > 0 && renderDealerHand()}
+                
+                {/* Player's Hands */}
+                {blackjack.playerHands[0].length > 0 && renderPlayerHands()}
+                
+                {/* Game Controls */}
+                {renderControls()}
+              </>
+            )}
           </div>
-        )}
-      
-        {/* Only show game elements if not broke or if game is in progress */}
-        {(!isBroke || blackjack.gamePhase !== "betting") && (
-          <>
-            {/* Dealer's Hand */}
-            {blackjack.dealerHand.length > 0 && renderDealerHand()}
-            
-            {/* Player's Hands */}
-            {blackjack.playerHands[0].length > 0 && renderPlayerHands()}
-            
-            {/* Game Controls */}
-            {renderControls()}
-          </>
-        )}
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="leaderboard" className="mt-0">
+          <LeaderboardTab />
+        </TabsContent>
+      </Tabs>
       
       {/* Coin animation */}
       {showAnimation && (

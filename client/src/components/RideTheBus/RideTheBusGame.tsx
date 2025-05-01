@@ -7,14 +7,17 @@ import { playSound } from "@/lib/utils/audio";
 import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
 import { CasinoButton } from "../ui/button-casino";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
+import LeaderboardTab from "../Leaderboard/LeaderboardTab";
 
 const RideTheBusGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("game");
   const [confettiConfig, setConfettiConfig] = useState<{
     particleCount: number;
     duration: number;
@@ -99,7 +102,7 @@ const RideTheBusGame = () => {
   
   // Render game interface
   return (
-    <div className="max-w-4xl mx-auto pt-6 max-h-screen overflow-y-auto">
+    <div className="max-w-4xl mx-auto pt-6 max-h-screen overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
       <CasinoCard gradient="green" bordered className="mb-4">
         <CasinoCardHeader className="py-2">
           <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
@@ -117,36 +120,49 @@ const RideTheBusGame = () => {
         </CasinoCardContent>
       </CasinoCard>
       
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 border border-slate-200 dark:border-slate-800">
-        {/* Show out of money message when broke */}
-        {isBroke && (
-          <div className="text-center py-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
-            <CasinoButton
-              variant="green"
-              onClick={resetBalance}
-            >
-              Reset Balance to $250
-            </CasinoButton>
-          </div>
-        )}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="game" className="text-base">Game</TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
+        </TabsList>
         
-        {/* Show "under development" message if not broke */}
-        {!isBroke && (
-          <div className="text-center py-12">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Coming Soon</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">
-              The new Ride the Bus game is currently under active development.
-              <br/>
-              Check back soon to play the full 4-stage version!
-            </p>
+        <TabsContent value="game" className="mt-0">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 border border-slate-200 dark:border-slate-800">
+            {/* Show out of money message when broke */}
+            {isBroke && (
+              <div className="text-center py-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
+                <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
+                <CasinoButton
+                  variant="green"
+                  onClick={resetBalance}
+                >
+                  Reset Balance to $250
+                </CasinoButton>
+              </div>
+            )}
             
-            {/* Demo betting UI */}
-            {renderBettingPhase()}
+            {/* Show "under development" message if not broke */}
+            {!isBroke && (
+              <div className="text-center py-12">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4">Coming Soon</h2>
+                <p className="mb-6 text-gray-600 dark:text-gray-400">
+                  The new Ride the Bus game is currently under active development.
+                  <br/>
+                  Check back soon to play the full 4-stage version!
+                </p>
+                
+                {/* Demo betting UI */}
+                {renderBettingPhase()}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="leaderboard" className="mt-0">
+          <LeaderboardTab />
+        </TabsContent>
+      </Tabs>
       
       {/* Coin animation */}
       {showAnimation && (
