@@ -47,7 +47,7 @@ export function shouldTriggerCelebration(winAmount: number, betAmount: number): 
 export function getConfettiConfig(tier: 'small' | 'medium' | 'large' | 'jackpot'): {
   particleCount: number;
   duration: number;
-  colors?: string[];
+  colors?: string[] | undefined;
 } {
   switch (tier) {
     case 'jackpot':

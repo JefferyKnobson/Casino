@@ -10,12 +10,24 @@ import { CasinoButton } from "../ui/button-casino";
 import Reel from "./Reel";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
+import ConfettiExplosion from "../ui/confetti-explosion";
 import { slotSymbolData } from "@/assets/svg/slot-symbols";
+import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
 
 const SlotMachine = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [spinning, setSpinning] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiConfig, setConfettiConfig] = useState<{
+    particleCount: number;
+    duration: number;
+    colors?: string[];
+  }>({
+    particleCount: 0,
+    duration: 0,
+    colors: undefined
+  });
   const { isMuted } = useAudio();
   
   const {
@@ -79,7 +91,37 @@ const SlotMachine = () => {
       if (result.winAmount > 0) {
         setAnimationAmount(result.winAmount);
         setShowAnimation(true);
-        toast.success(`You won $${result.winAmount}!`);
+        
+        // Check if win is big enough for confetti celebration
+        const celebration = shouldTriggerCelebration(result.winAmount, slotMachine.bet);
+        if (celebration.trigger) {
+          // Configure and show confetti based on win size
+          const config = getConfettiConfig(celebration.tier);
+          setConfettiConfig(config);
+          setShowConfetti(true);
+          
+          // Play success sound for bigger wins
+          if (!isMuted && (celebration.tier === 'large' || celebration.tier === 'jackpot')) {
+            playSound("success", 0.8);
+          }
+          
+          // Show appropriate toast message based on win size
+          if (celebration.tier === 'jackpot') {
+            toast.success(`JACKPOT! You won $${result.winAmount}!`, {
+              duration: 5000,
+              className: "font-bold text-xl",
+            });
+          } else if (celebration.tier === 'large') {
+            toast.success(`BIG WIN! $${result.winAmount}!`, {
+              duration: 4000,
+              className: "font-bold",
+            });
+          } else {
+            toast.success(`You won $${result.winAmount}!`);
+          }
+        } else {
+          toast.success(`You won $${result.winAmount}!`);
+        }
       } else {
         toast.error("Better luck next time!");
       }
@@ -270,6 +312,17 @@ const SlotMachine = () => {
           amount={animationAmount} 
           isWinning={true}
           onComplete={() => setShowAnimation(false)} 
+        />
+      )}
+      
+      {/* Confetti celebration for big wins */}
+      {showConfetti && (
+        <ConfettiExplosion
+          active={showConfetti}
+          duration={confettiConfig.duration}
+          particleCount={confettiConfig.particleCount}
+          colors={confettiConfig.colors}
+          onComplete={() => setShowConfetti(false)}
         />
       )}
     </div>
