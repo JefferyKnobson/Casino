@@ -5,7 +5,8 @@ import { useCasinoGame } from "./lib/stores/useCasinoGame";
 import Layout from "./components/Layout";
 import CasinoLobby from "./components/CasinoLobby";
 import BlackjackGame from "./components/Blackjack/BlackjackGame";
-import RideTheBusGame from "./components/RoundTheBus/RoundTheBusGame";
+import HigherOrLowerGame from "./components/RoundTheBus/RoundTheBusGame";
+import RideTheBusGame from "./components/RideTheBus/RideTheBusGame";
 import SlotMachine from "./components/SlotMachine/SlotMachine";
 import GameHUD from "./components/common/GameHUD";
 import NotFound from "./pages/not-found";
@@ -75,18 +76,12 @@ function App() {
             } />
             <Route path="/higher-or-lower" element={
               <GameRouteWrapper>
-                <RideTheBusGame />
+                <HigherOrLowerGame />
               </GameRouteWrapper>
             } />
             <Route path="/ride-the-bus" element={
               <GameRouteWrapper>
-                {/* New Ride the Bus implementation will go here */}
-                <div className="flex items-center justify-center h-[70vh]">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
-                    <p className="text-slate-600">The new Ride the Bus game is under development.</p>
-                  </div>
-                </div>
+                <RideTheBusGame />
               </GameRouteWrapper>
             } />
             <Route path="/slots" element={
