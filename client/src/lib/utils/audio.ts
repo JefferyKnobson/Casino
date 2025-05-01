@@ -1,6 +1,6 @@
 // Audio utilities for the casino game
 
-type AudioType = "background" | "win" | "loss" | "hit" | "cash" | "deal" | "bet" | "spin" | "gameOver";
+export type AudioType = "background" | "win" | "loss" | "hit" | "cash" | "deal" | "bet" | "spin" | "gameOver" | "success";
 
 interface AudioFiles {
   backgroundMusic: HTMLAudioElement;
@@ -108,6 +108,9 @@ export function playSound(type: AudioType, volumeOverride?: number): void {
       break;
     case "gameOver":
       sound = audioFiles.gameOverSound;
+      break;
+    case "success":
+      sound = audioFiles.successSound;
       break;
     default:
       return;

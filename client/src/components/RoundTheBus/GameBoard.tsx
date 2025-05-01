@@ -4,41 +4,29 @@ import Card from "../Blackjack/Card";
 import Chip from "../ui/chip";
 
 interface GameBoardProps {
-  pyramid: (CardType | null)[][];
+  cardsInPlay: (CardType | null)[];
   currentCard: CardType | null;
-  currentLevel: number;
+  currentPosition: number;
   bet: number;
 }
 
-const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) => {
-  // Calculate completed rounds
-  const completedRounds = 
-    pyramid[0].every(Boolean) ? 
-      (pyramid[1].every(Boolean) ? 
-        (pyramid[2].every(Boolean) ? 3 : 2) 
-        : 1) 
-      : 0;
+const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet }: GameBoardProps) => {
+  // Calculate completed rounds (0-4)
+  const completedPositions = currentPosition;
   
   // Calculate payout multiplier based on completed rounds
   const getPayoutMultiplier = () => {
-    switch (completedRounds) {
-      case 1: return 2;   // Round 1: x2
-      case 2: return 5;   // Round 2: x5
-      case 3: return 10;  // Round 3: x10
-      case 4: return 20;  // Round 4: x20
-      default: return 0;  // No completed rounds
+    switch (completedPositions) {
+      case 1: return 2;   // 1 correct guess: x2
+      case 2: return 4;   // 2 correct guesses: x4
+      case 3: return 8;   // 3 correct guesses: x8
+      case 4: return 10;  // All 4 correct guesses: x10
+      default: return 0;  // No completed positions
     }
   };
   
   const payoutMultiplier = getPayoutMultiplier();
   const possibleWinning = bet * payoutMultiplier;
-  
-  // Calculate current active level completion
-  const currentLevelComplete = currentLevel === 0 
-    ? pyramid[0].every(Boolean) 
-    : currentLevel === 1 
-      ? pyramid[1].every(Boolean) 
-      : pyramid[2].every(Boolean);
   
   // Card scale based on screen size
   const cardScale = 0.7; // Smaller cards to fit on screen
@@ -63,14 +51,14 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
       
       {/* Payout information */}
       <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs sm:text-sm">
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 1: 2x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 2: 5x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 3: 10x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Round 4: 20x</div>
+        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">1 Card: 2x</div>
+        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">2 Cards: 4x</div>
+        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">3 Cards: 8x</div>
+        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">4 Cards: 10x</div>
       </div>
       
-      {/* Current card and pyramid together in a more compact layout */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-8">
+      {/* Current card and cards in play in a linear layout */}
+      <div className="flex flex-col items-center gap-6 sm:gap-8">
         {/* Current card */}
         {currentCard && (
           <div>
@@ -85,35 +73,12 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
           </div>
         )}
         
-        {/* Pyramid structure */}
-        <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-          {/* Level 3 (Top) - Round 3 */}
-          <div className="flex justify-center">
-            {pyramid[2].map((card, index) => (
-              <div key={`2-${index}`} className="mx-[2px]">
-                {card ? (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", damping: 12, delay: 0.2 }}
-                  >
-                    <Card card={card} faceUp={true} scale={cardScale} />
-                  </motion.div>
-                ) : (
-                  <div className="w-[50px] h-[70px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                    {currentLevel === 2 && !currentLevelComplete && (
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          
-          {/* Level 2 (Middle) - Round 2 */}
-          <div className="flex justify-center">
-            {pyramid[1].map((card, index) => (
-              <div key={`1-${index}`} className="mx-[2px]">
+        {/* Cards in play - linear arrangement */}
+        <div>
+          <div className="text-center mb-2 font-medium text-sm">Cards in Play</div>
+          <div className="flex justify-center space-x-3 sm:space-x-4">
+            {cardsInPlay.map((card, index) => (
+              <div key={`card-${index}`} className="relative">
                 {card ? (
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -121,33 +86,16 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
                     transition={{ type: "spring", damping: 12, delay: 0.1 * index }}
                   >
                     <Card card={card} faceUp={true} scale={cardScale} />
+                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center">
+                      {index + 1}
+                    </div>
                   </motion.div>
                 ) : (
-                  <div className="w-[50px] h-[70px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                    {currentLevel === 1 && !currentLevelComplete && (
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          
-          {/* Level 1 (Bottom) - Round 1 */}
-          <div className="flex justify-center">
-            {pyramid[0].map((card, index) => (
-              <div key={`0-${index}`} className="mx-[2px]">
-                {card ? (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", damping: 12, delay: 0.1 * index }}
-                  >
-                    <Card card={card} faceUp={true} scale={cardScale} />
-                  </motion.div>
-                ) : (
-                  <div className="w-[50px] h-[70px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                    {currentLevel === 0 && !currentLevelComplete && (
+                  <div className="w-[50px] h-[70px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-300 text-white text-xs flex items-center justify-center">
+                      {index + 1}
+                    </div>
+                    {currentPosition + 1 === index && (
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
                     )}
                   </div>
@@ -159,7 +107,7 @@ const GameBoard = ({ pyramid, currentCard, currentLevel, bet }: GameBoardProps) 
       </div>
       
       {/* Game completion status */}
-      {completedRounds === 3 && (
+      {completedPositions === 4 && (
         <motion.div 
           className="mt-4 p-2 bg-green-100 text-green-800 rounded-md font-bold text-sm sm:text-base"
           initial={{ opacity: 0, y: 20 }}

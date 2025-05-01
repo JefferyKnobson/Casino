@@ -766,8 +766,12 @@ function calculateHandValue(hand: Card[]): number {
 }
 
 // Round the Bus turn logic
+// Round the Bus turn logic - used internally by chooseHigher and chooseLower
+// No longer using the this-binding approach that was causing issues
 function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
-  const { roundTheBus } = get();
+  // Access state directly since this is a utility function used within the store
+  const state = useGameState.getState();
+  const { roundTheBus } = state;
   const { deck, cardsInPlay, currentCard, currentPosition, gamePhase } = roundTheBus;
   
   if (!currentCard || gamePhase !== "playing") {
@@ -793,7 +797,7 @@ function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
   
   if (!correct) {
     // Game over - incorrect guess
-    set({
+    useGameState.setState({
       roundTheBus: {
         ...roundTheBus,
         deck: newDeck,
@@ -822,7 +826,7 @@ function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
   }
   
   // Update state with success
-  set({
+  useGameState.setState({
     roundTheBus: {
       ...roundTheBus,
       deck: newDeck,

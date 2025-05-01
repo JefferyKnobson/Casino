@@ -9,7 +9,25 @@ import { CasinoButton } from "../ui/button-casino";
 import GameBoard from "./GameBoard";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
-import { calculateRoundTheBusPayout } from "@/lib/utils/gameLogic";
+
+// Function to calculate the payout based on the number of correct guesses (position)
+const calculateRoundTheBusPayout = (state: any) => {
+  const { currentPosition, bet, gamePhase } = state;
+  
+  if (gamePhase !== "finished") return 0;
+  
+  // If position is 0, player lost on the first guess
+  if (currentPosition === 0) return 0;
+  
+  // Calculate based on how many correct guesses the player made
+  switch (currentPosition) {
+    case 1: return bet * 2;   // 1 correct guess: 2x
+    case 2: return bet * 4;   // 2 correct guesses: 4x
+    case 3: return bet * 8;   // 3 correct guesses: 8x
+    case 4: return bet * 10;  // All 4 correct guesses: 10x
+    default: return 0;
+  }
+};
 
 const RoundTheBusGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
@@ -178,9 +196,9 @@ const RoundTheBusGame = () => {
             {/* Game Board */}
             {roundTheBus.currentCard && (
               <GameBoard 
-                pyramid={roundTheBus.pyramid}
+                cardsInPlay={roundTheBus.cardsInPlay}
                 currentCard={roundTheBus.currentCard}
-                currentLevel={roundTheBus.currentLevel}
+                currentPosition={roundTheBus.currentPosition}
                 bet={roundTheBus.bet}
               />
             )}
