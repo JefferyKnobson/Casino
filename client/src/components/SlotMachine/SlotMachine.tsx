@@ -233,8 +233,7 @@ const SlotMachine = () => {
                   ))}
                 </div>
                 
-                {/* Payline */}
-                <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 border-2 border-amber-500 z-10 opacity-50"></div>
+                {/* Payline removed as requested */}
                 
                 {/* Win markers */}
                 {slotMachine.lastResult?.winLines.includes(0) && !spinning && (

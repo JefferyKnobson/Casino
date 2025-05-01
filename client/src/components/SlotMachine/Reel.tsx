@@ -73,16 +73,19 @@ const Reel = ({ symbol, spinning, delay = 0, isWinning = false }: ReelProps) => 
         </motion.div>
       )}
       
-      <motion.div
-        className={`h-full w-full flex items-center justify-center ${
-          isWinning ? "bg-amber-100 dark:bg-amber-900/40" : "bg-white dark:bg-zinc-700"
-        }`}
-        variants={winVariants}
-        animate={isWinning && !spinning ? "winning" : "idle"}
-        initial={false}
-      >
-        <Symbol symbol={symbol} size={60} />
-      </motion.div>
+      {/* Only show the solid symbols when not spinning */}
+      {!spinning && (
+        <motion.div
+          className={`h-full w-full flex items-center justify-center ${
+            isWinning ? "bg-amber-100 dark:bg-amber-900/40" : "bg-white dark:bg-zinc-700"
+          }`}
+          variants={winVariants}
+          animate={isWinning ? "winning" : "idle"}
+          initial={false}
+        >
+          <Symbol symbol={symbol} size={60} />
+        </motion.div>
+      )}
     </div>
   );
 };
