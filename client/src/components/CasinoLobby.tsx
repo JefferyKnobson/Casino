@@ -29,7 +29,7 @@ const CasinoLobby = () => {
     }
   }, [setGame, location.state]);
 
-  const handleSelectGame = (game: "blackjack" | "round-the-bus" | "ride-the-bus" | "slots") => {
+  const handleSelectGame = (game: "blackjack" | "higher-or-lower" | "ride-the-bus" | "slots") => {
     if (!isMuted) {
       playSound("hit");
     }
@@ -100,14 +100,14 @@ const CasinoLobby = () => {
               </CasinoCardFooter>
             </CasinoCard>
             
-            <CasinoCard gradient="green" bordered elevated className="flex flex-col h-full">
+            <CasinoCard gradient="blue" bordered elevated className="flex flex-col h-full">
               <CasinoCardHeader className="p-4 sm:p-6">
-                <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
+                <CasinoCardTitle>Higher or Lower</CasinoCardTitle>
               </CasinoCardHeader>
               <CasinoCardContent className="flex-1 p-4 sm:p-6">
                 <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm sm:text-base">
                   Guess if the next card will be higher or lower than the current one.
-                  Complete all 4 cards to win up to 20x your bet! Each successful card doubles your potential winnings.
+                  Complete all 4 cards to win up to 20x your bet! Each successful card increases your potential winnings.
                 </p>
                 <div className="flex justify-center my-3 sm:my-4">
                   <div className="flex space-x-3">
@@ -117,6 +117,40 @@ const CasinoLobby = () => {
                     <div className="h-12 w-10 sm:h-16 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-red-600 text-base sm:text-lg font-bold">A♥</div>
                   </div>
                 </div>
+                <div className="text-center text-xs text-slate-500">Only $5 bets allowed</div>
+              </CasinoCardContent>
+              <CasinoCardFooter className="p-4 sm:p-6 pt-2 sm:pt-3">
+                <CasinoButton 
+                  variant="blue" 
+                  className="w-full" 
+                  onClick={() => handleSelectGame("higher-or-lower")}
+                >
+                  Play Higher or Lower
+                </CasinoButton>
+              </CasinoCardFooter>
+            </CasinoCard>
+            
+            <CasinoCard gradient="green" bordered elevated className="flex flex-col h-full">
+              <CasinoCardHeader className="p-4 sm:p-6">
+                <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
+              </CasinoCardHeader>
+              <CasinoCardContent className="flex-1 p-4 sm:p-6">
+                <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm sm:text-base">
+                  The classic Ride the Bus card game with four challenging stages:
+                  <span className="block mt-1 text-xs">1. Red or Black</span>
+                  <span className="block text-xs">2. Higher or Lower</span>
+                  <span className="block text-xs">3. Inside or Outside</span>
+                  <span className="block text-xs">4. Guess the Suit</span>
+                </p>
+                <div className="flex justify-center my-3 sm:my-4">
+                  <div className="flex space-x-2">
+                    <div className="h-12 w-10 sm:h-14 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-red-600 text-base sm:text-lg font-bold">♥</div>
+                    <div className="h-12 w-10 sm:h-14 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-black text-base sm:text-lg font-bold">♠</div>
+                    <div className="h-12 w-10 sm:h-14 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-black text-base sm:text-lg font-bold">♣</div>
+                    <div className="h-12 w-10 sm:h-14 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-red-600 text-base sm:text-lg font-bold">♦</div>
+                  </div>
+                </div>
+                <div className="text-center text-xs text-slate-500 mt-1">Coming soon!</div>
               </CasinoCardContent>
               <CasinoCardFooter className="p-4 sm:p-6 pt-2 sm:pt-3">
                 <CasinoButton 

@@ -53,24 +53,24 @@ export function getConfettiConfig(tier: 'small' | 'medium' | 'large' | 'jackpot'
     case 'jackpot':
       return {
         particleCount: 1000,
-        duration: 8000,
+        duration: 4000, // Reduced from 8000
         colors: ['#FFD700', '#FFC107', '#FFEB3B', '#FFFF00', '#F5F5DC'], // Gold colors
       };
     case 'large':
       return {
         particleCount: 500,
-        duration: 5000,
+        duration: 2500, // Reduced from 5000
       };
     case 'medium':
       return {
         particleCount: 200,
-        duration: 3000,
+        duration: 1500, // Reduced from 3000
       };
     case 'small':
     default:
       return {
         particleCount: 100,
-        duration: 2000,
+        duration: 1000, // Reduced from 2000
       };
   }
 }

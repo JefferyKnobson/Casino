@@ -184,19 +184,18 @@ const RideTheBusGame = () => {
       <h2 className="text-2xl font-bold mb-6">Place Your Bet</h2>
       
       <div className="flex flex-wrap justify-center gap-4 mb-6">
-        {[5, 10, 25, 50, 100].map(value => (
-          <Chip
-            key={value}
-            value={value as any}
-            size="lg"
-            onClick={() => handlePlaceBet(value)}
-            disabled={value > balance}
-          />
-        ))}
+        {/* Only allow $5 bets for Higher or Lower */}
+        <Chip
+          key={5}
+          value={5}
+          size="lg"
+          onClick={() => handlePlaceBet(5)}
+          disabled={5 > balance}
+        />
       </div>
       
       <div className="text-center text-gray-600 dark:text-gray-400 mt-4">
-        Click on a chip to place your bet
+        Higher or Lower only accepts $5 bets
       </div>
     </div>
   );
@@ -206,7 +205,7 @@ const RideTheBusGame = () => {
     <div className="max-w-4xl mx-auto pt-6">
       <CasinoCard gradient="green" bordered className="mb-4">
         <CasinoCardHeader className="py-2">
-          <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
+          <CasinoCardTitle>Higher or Lower</CasinoCardTitle>
         </CasinoCardHeader>
         <CasinoCardContent className="py-2">
           <div className="text-xs text-gray-600 dark:text-gray-400">

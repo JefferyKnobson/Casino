@@ -73,14 +73,20 @@ function App() {
                 <BlackjackGame />
               </GameRouteWrapper>
             } />
-            <Route path="/ride-the-bus" element={
+            <Route path="/higher-or-lower" element={
               <GameRouteWrapper>
                 <RideTheBusGame />
               </GameRouteWrapper>
             } />
-            <Route path="/round-the-bus" element={
+            <Route path="/ride-the-bus" element={
               <GameRouteWrapper>
-                <RideTheBusGame />
+                {/* New Ride the Bus implementation will go here */}
+                <div className="flex items-center justify-center h-[70vh]">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
+                    <p className="text-slate-600">The new Ride the Bus game is under development.</p>
+                  </div>
+                </div>
               </GameRouteWrapper>
             } />
             <Route path="/slots" element={
