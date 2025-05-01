@@ -8,6 +8,7 @@ interface CasinoGameState {
   balance: number;
   isBroke: boolean;
   activeGame: GameType;
+  startTime: number; // Timestamp when the session started
   gameHistory: {
     time: string;
     game: GameType;
@@ -22,6 +23,7 @@ interface CasinoGameState {
   addToHistory: (game: GameType, amount: number, result: "win" | "loss" | "tie") => void;
   resetBalance: () => void;
   checkBrokeStatus: () => boolean;
+  getTimePlayed: () => number; // Returns time played in seconds
 }
 
 export const useCasinoGame = create<CasinoGameState>()(
