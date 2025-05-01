@@ -81,7 +81,8 @@ export const useCasinoGame = create<CasinoGameState>()(
       resetBalance: () => {
         set({ 
           balance: 250,
-          isBroke: false
+          isBroke: false,
+          startTime: Date.now() // Reset the session start time
         });
         toast.success("Your balance has been reset to $250!");
       },

@@ -26,7 +26,7 @@ interface DrawOutDialogProps {
 const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) => {
   const [playerName, setPlayerName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { balance } = useCasinoGame();
+  const { balance, resetBalance } = useCasinoGame();
   const navigate = useNavigate();
   
   const handleSubmit = async () => {
@@ -48,6 +48,9 @@ const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) =
       // Success!
       toast.success('Your score has been recorded on the leaderboard!');
       onOpenChange(false);
+      
+      // Reset balance and time
+      resetBalance();
       
       // Navigate to leaderboard tab
       setTimeout(() => {

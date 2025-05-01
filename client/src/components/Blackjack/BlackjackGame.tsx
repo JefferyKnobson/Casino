@@ -173,6 +173,28 @@ const BlackjackGame = () => {
     dealBlackjack();
   };
   
+  // Handle all-in bet
+  const handleAllIn = () => {
+    if (blackjack.gamePhase !== "betting" || balance <= 0) return;
+    
+    if (!isMuted) {
+      playSound("bet");
+      // For a big bet, add an extra sound
+      setTimeout(() => playSound("success", 0.7), 300);
+    }
+    
+    // Round down to nearest 5 for consistency with chip values
+    const allInAmount = Math.floor(balance / 5) * 5;
+    
+    // Safeguard to ensure we don't bet more than available
+    const betAmount = Math.min(allInAmount, balance);
+    
+    placeBet(betAmount);
+    dealBlackjack();
+    
+    toast.success(`All in! Betting $${betAmount}`, { duration: 2000 });
+  };
+  
   // Handle game actions
   const handleHit = () => {
     if (!isMuted) {

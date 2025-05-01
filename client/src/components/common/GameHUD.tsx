@@ -70,16 +70,7 @@ const GameHUD = () => {
               <HelpCircle className="h-4 w-4" />
             </Button>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.reload()}
-              className="h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md"
-              title="I'm Stuck"
-            >
-              <Lock className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">I'm Stuck</span>
-            </Button>
+{/* I'm Stuck button removed to avoid duplication */}
             
             <Button
               variant="default"
