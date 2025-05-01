@@ -389,7 +389,7 @@ const BlackjackGame = () => {
   };
   
   return (
-    <div className="max-w-full sm:max-w-4xl mx-auto pt-4 sm:pt-6 px-2">
+    <div className="max-w-full sm:max-w-4xl mx-auto pt-4 sm:pt-6 px-2 max-h-screen overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
       <CasinoCard gradient="gold" bordered className="mb-4 sm:mb-6">
         <CasinoCardHeader className="p-4 sm:p-6">
           <CasinoCardTitle>Blackjack</CasinoCardTitle>
