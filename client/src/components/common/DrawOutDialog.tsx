@@ -63,7 +63,7 @@ const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) =
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white dark:bg-slate-800 shadow-xl border-2 border-slate-200 dark:border-slate-700">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Trophy className="h-5 w-5 text-yellow-500" />

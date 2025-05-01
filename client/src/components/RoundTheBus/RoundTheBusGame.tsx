@@ -204,20 +204,19 @@ const RideTheBusGame = () => {
   // Render game interface
   return (
     <div className="max-w-4xl mx-auto pt-6">
-      <CasinoCard gradient="green" bordered className="mb-6">
-        <CasinoCardHeader>
+      <CasinoCard gradient="green" bordered className="mb-4">
+        <CasinoCardHeader className="py-2">
           <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
         </CasinoCardHeader>
-        <CasinoCardContent>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <CasinoCardContent className="py-2">
+          <div className="text-xs text-gray-600 dark:text-gray-400">
             <p>Guess if the next card will be higher or lower than the current one. Same value is a loss.</p>
-            <p>Payouts increase with each correct guess:</p>
-            <ul className="list-disc pl-5 mt-1 space-y-0.5">
-              <li>1st card: 2x your bet</li>
-              <li>2nd card: 4x your bet</li>
-              <li>3rd card: 8x your bet</li>
-              <li>4th card: 20x your bet (JACKPOT!)</li>
-            </ul>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+              <span>1st: 2x</span>
+              <span>2nd: 4x</span>
+              <span>3rd: 8x</span>
+              <span>4th: 20x (JACKPOT!)</span>
+            </div>
           </div>
         </CasinoCardContent>
       </CasinoCard>

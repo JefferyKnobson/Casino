@@ -35,10 +35,10 @@ const GameHUD = () => {
   return (
     <>
       {/* Fixed position HUD at the bottom of the screen */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pointer-events-none z-10">
+      <div className="fixed bottom-0 left-0 right-0 p-4 pointer-events-none z-50">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
           {/* Left side - Game info */}
-          <Card className="bg-white/90 dark:bg-slate-900/90 shadow-md p-2 flex items-center space-x-3 pointer-events-auto backdrop-blur-sm">
+          <Card className="bg-white dark:bg-slate-900 shadow-lg border border-slate-200 dark:border-slate-700 p-2 flex items-center space-x-3 pointer-events-auto">
             <button
               onClick={handleGoHome}
               className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -64,7 +64,7 @@ const GameHUD = () => {
               variant="outline"
               size="sm"
               onClick={handleHelp}
-              className="h-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
+              className="h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md"
               title="Help"
             >
               <HelpCircle className="h-4 w-4" />
@@ -74,7 +74,7 @@ const GameHUD = () => {
               variant="outline"
               size="sm"
               onClick={() => window.location.reload()}
-              className="h-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
+              className="h-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-md"
               title="I'm Stuck"
             >
               <Lock className="h-4 w-4 mr-2" />
@@ -85,7 +85,7 @@ const GameHUD = () => {
               variant="default"
               size="sm"
               onClick={() => setDrawOutDialogOpen(true)}
-              className="h-10 bg-green-600 hover:bg-green-700 text-white"
+              className="h-10 bg-green-600 hover:bg-green-700 text-white font-medium shadow-md"
               title="Cash Out"
             >
               <DollarSign className="h-4 w-4 mr-2" />
