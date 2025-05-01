@@ -281,8 +281,7 @@ const CasinoLobby = () => {
                           <td className="py-1 sm:py-2 px-2 sm:px-4">{entry.time}</td>
                           <td className="py-1 sm:py-2 px-2 sm:px-4">
                             {entry.game === "blackjack" && "Blackjack"}
-                            {entry.game === "round-the-bus" && "Ride the Bus"}
-                            {entry.game === "ride-the-bus" && "Ride the Bus"}
+                            {(entry.game === "round-the-bus" || entry.game === "ride-the-bus") && "Ride the Bus"}
                             {entry.game === "slots" && "Slots"}
                           </td>
                           <td className="py-1 sm:py-2 px-2 sm:px-4 text-right">${Math.abs(entry.amount)}</td>

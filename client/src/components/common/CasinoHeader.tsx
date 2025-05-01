@@ -50,10 +50,10 @@ const CasinoHeader = ({ isMuted, onToggleSound }: CasinoHeaderProps) => {
               21
             </Link>
             <Link 
-              to="/round-the-bus" 
+              to="/ride-the-bus" 
               className={cn(
                 "px-2 py-1 rounded-md text-xs font-medium transition-colors",
-                isActive('/round-the-bus') 
+                isActive('/ride-the-bus') 
                   ? "bg-primary-foreground/20 text-white" 
                   : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-white"
               )}
@@ -98,15 +98,15 @@ const CasinoHeader = ({ isMuted, onToggleSound }: CasinoHeaderProps) => {
               Blackjack
             </Link>
             <Link 
-              to="/round-the-bus" 
+              to="/ride-the-bus" 
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                isActive('/round-the-bus') 
+                isActive('/ride-the-bus') 
                   ? "bg-primary-foreground/20 text-white" 
                   : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-white"
               )}
             >
-              Round the Bus
+              Ride the Bus
             </Link>
             <Link 
               to="/slots" 
