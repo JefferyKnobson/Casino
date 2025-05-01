@@ -6,16 +6,29 @@ import { useCasinoGame } from "@/lib/stores/useCasinoGame";
 import { useAudio } from "@/lib/stores/useAudio";
 import { calculateBlackjackOutcome, calculateBlackjackPayout } from "@/lib/utils/gameLogic";
 import { playSound } from "@/lib/utils/audio";
+import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
 import Card from "./Card";
 import GameControls from "./GameControls";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
+import { CasinoButton } from "../ui/button-casino";
 import Chip, { ChipStack } from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
+import ConfettiExplosion from "../ui/confetti-explosion";
 import { Button } from "../ui/button";
 
 const BlackjackGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiConfig, setConfettiConfig] = useState<{
+    particleCount: number;
+    duration: number;
+    colors?: string[];
+  }>({
+    particleCount: 0,
+    duration: 0,
+    colors: undefined
+  });
   const { isMuted } = useAudio();
   const {
     blackjack,
@@ -78,13 +91,45 @@ const BlackjackGame = () => {
       if (totalWinnings !== 0) {
         setAnimationAmount(totalWinnings);
         setShowAnimation(true);
-      }
-      
-      // Show toast notification
-      if (totalWinnings > 0) {
-        toast.success(`You won $${totalWinnings}!`);
-      } else if (totalWinnings < 0) {
-        toast.error(`You lost $${Math.abs(totalWinnings)}`);
+        
+        // Check if win is significant enough for confetti celebration
+        if (totalWinnings > 0) {
+          // Get the highest bet from all hands to calculate the win ratio
+          const highestBet = Math.max(...blackjack.bets);
+          
+          // Check if the win is worthy of a celebration
+          const celebration = shouldTriggerCelebration(totalWinnings, highestBet);
+          if (celebration.trigger) {
+            // Configure confetti based on win size
+            const config = getConfettiConfig(celebration.tier);
+            setConfettiConfig(config);
+            setShowConfetti(true);
+            
+            // Play special success sound for big wins
+            if (!isMuted && (celebration.tier === 'large' || celebration.tier === 'jackpot')) {
+              playSound("success", 0.8);
+            }
+            
+            // Show appropriate toast based on win significance
+            if (celebration.tier === 'jackpot') {
+              toast.success(`JACKPOT! You won $${totalWinnings}!`, {
+                duration: 5000,
+                className: "font-bold text-xl",
+              });
+            } else if (celebration.tier === 'large') {
+              toast.success(`BIG WIN! $${totalWinnings}!`, {
+                duration: 4000,
+                className: "font-bold",
+              });
+            } else {
+              toast.success(`You won $${totalWinnings}!`);
+            }
+          } else {
+            toast.success(`You won $${totalWinnings}!`);
+          }
+        } else {
+          toast.error(`You lost $${Math.abs(totalWinnings)}`);
+        }
       } else {
         toast.info("It's a push. Your bet is returned.");
       }
@@ -359,6 +404,17 @@ const BlackjackGame = () => {
           amount={animationAmount} 
           isWinning={animationAmount > 0}
           onComplete={() => setShowAnimation(false)} 
+        />
+      )}
+
+      {/* Confetti celebration for big wins */}
+      {showConfetti && (
+        <ConfettiExplosion
+          active={showConfetti}
+          duration={confettiConfig.duration}
+          particleCount={confettiConfig.particleCount}
+          colors={confettiConfig.colors}
+          onComplete={() => setShowConfetti(false)}
         />
       )}
     </div>

@@ -4,11 +4,13 @@ import { useGameState } from "@/lib/stores/useGameState";
 import { useCasinoGame } from "@/lib/stores/useCasinoGame";
 import { useAudio } from "@/lib/stores/useAudio";
 import { playSound } from "@/lib/utils/audio";
+import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
 import { CasinoButton } from "../ui/button-casino";
 import GameBoard from "./GameBoard";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
+import ConfettiExplosion from "../ui/confetti-explosion";
 
 // Function to calculate the payout based on the number of correct guesses (position)
 const calculateRoundTheBusPayout = (state: any) => {
@@ -32,6 +34,16 @@ const calculateRoundTheBusPayout = (state: any) => {
 const RoundTheBusGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiConfig, setConfettiConfig] = useState<{
+    particleCount: number;
+    duration: number;
+    colors?: string[];
+  }>({
+    particleCount: 0,
+    duration: 0,
+    colors: undefined
+  });
   const { isMuted } = useAudio();
   const {
     roundTheBus,
@@ -75,11 +87,39 @@ const RoundTheBusGame = () => {
       if (payout > 0) {
         setAnimationAmount(payout);
         setShowAnimation(true);
-      }
-      
-      // Show toast notification
-      if (payout > 0) {
-        toast.success(`You won $${payout}!`);
+        
+        // Check if win is significant enough for confetti celebration
+        // Round the Bus can have very high payouts, especially for a full run
+        const celebration = shouldTriggerCelebration(payout, roundTheBus.bet);
+        
+        if (celebration.trigger) {
+          // Configure confetti based on win size
+          const config = getConfettiConfig(celebration.tier);
+          setConfettiConfig(config);
+          setShowConfetti(true);
+          
+          // Play special success sound for big wins
+          if (!isMuted && (celebration.tier === 'large' || celebration.tier === 'jackpot')) {
+            playSound("success", 0.8);
+          }
+          
+          // Show appropriate toast based on win significance
+          if (celebration.tier === 'jackpot') {
+            toast.success(`JACKPOT! You won $${payout}!`, {
+              duration: 5000,
+              className: "font-bold text-xl",
+            });
+          } else if (celebration.tier === 'large') {
+            toast.success(`BIG WIN! $${payout}!`, {
+              duration: 4000,
+              className: "font-bold",
+            });
+          } else {
+            toast.success(`You won $${payout}!`);
+          }
+        } else {
+          toast.success(`You won $${payout}!`);
+        }
       } else {
         toast.error("Better luck next time!");
       }
@@ -247,6 +287,17 @@ const RoundTheBusGame = () => {
           amount={animationAmount} 
           isWinning={true}
           onComplete={() => setShowAnimation(false)} 
+        />
+      )}
+
+      {/* Confetti celebration for big wins */}
+      {showConfetti && (
+        <ConfettiExplosion
+          active={showConfetti}
+          duration={confettiConfig.duration}
+          particleCount={confettiConfig.particleCount}
+          colors={confettiConfig.colors}
+          onComplete={() => setShowConfetti(false)}
         />
       )}
     </div>
