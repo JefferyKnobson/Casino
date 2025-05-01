@@ -202,7 +202,7 @@ const RideTheBusGame = () => {
   
   // Render game interface
   return (
-    <div className="max-w-4xl mx-auto pt-6">
+    <div className="max-w-4xl mx-auto pt-6 max-h-screen overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
       <CasinoCard gradient="green" bordered className="mb-4">
         <CasinoCardHeader className="py-2">
           <CasinoCardTitle>Higher or Lower</CasinoCardTitle>
