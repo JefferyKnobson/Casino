@@ -12,17 +12,14 @@ interface GameBoardProps {
 }
 
 const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: GameBoardProps) => {
-  // Calculate completed rounds (0-4)
-  const completedPositions = currentPosition;
-  
-  // Calculate payout multiplier based on completed rounds
+  // Calculate payout multiplier based on current stage
   const getPayoutMultiplier = () => {
-    switch (completedPositions) {
-      case 1: return 2;    // 1 correct guess: x2
-      case 2: return 4;    // 2 correct guesses: x4
-      case 3: return 8;    // 3 correct guesses: x8
-      case 4: return 20;   // All 4 correct guesses: x20
-      default: return 0;   // No completed positions
+    switch (currentPosition) {
+      case 1: return 2;    // Passed stage 1 (red/black): x2
+      case 2: return 4;    // Passed stage 2 (higher/lower): x4
+      case 3: return 8;    // Passed stage 3 (inside/outside): x8
+      case 4: return 20;   // Passed all 4 stages (suits): x20
+      default: return 0;   // No completed stages
     }
   };
   
@@ -32,8 +29,16 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
   // Card scale based on screen size - smaller to fit more cards
   const cardScale = 0.55; 
   
-  // Stage names
-  const stageNames = ["Red or Black", "Higher or Lower", "Inside or Outside", "Guess the Suit"];
+  // Get stage name for display
+  const getStageName = (stageNum: number) => {
+    switch (stageNum) {
+      case 0: return "Red or Black";
+      case 1: return "Higher or Lower";
+      case 2: return "Inside or Outside";
+      case 3: return "Guess the Suit";
+      default: return "";
+    }
+  };
   
   return (
     <div className="flex flex-col items-center pb-20 sm:pb-16">
@@ -56,22 +61,30 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
         
         {/* Payout information in a compact horizontal layout */}
         <div className="flex justify-center items-center flex-wrap gap-1">
-          <div className={`px-2 py-0.5 text-xs rounded ${completedPositions >= 1 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>1st: 2x</div>
-          <div className={`px-2 py-0.5 text-xs rounded ${completedPositions >= 2 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>2nd: 4x</div>
-          <div className={`px-2 py-0.5 text-xs rounded ${completedPositions >= 3 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>3rd: 8x</div>
-          <div className={`px-2 py-0.5 text-xs rounded ${completedPositions >= 4 ? 'bg-green-100 dark:bg-green-900 font-bold' : 'bg-slate-100 dark:bg-slate-800'}`}>4th: 20x</div>
+          <div className={`px-2 py-0.5 text-xs rounded ${stage >= 0 ? (currentPosition >= 1 ? 'bg-green-100 dark:bg-green-900' : 'bg-blue-100 dark:bg-blue-900') : 'bg-slate-100 dark:bg-slate-800'}`}>Stage 1: 2x</div>
+          <div className={`px-2 py-0.5 text-xs rounded ${stage >= 1 ? (currentPosition >= 2 ? 'bg-green-100 dark:bg-green-900' : 'bg-blue-100 dark:bg-blue-900') : 'bg-slate-100 dark:bg-slate-800'}`}>Stage 2: 4x</div>
+          <div className={`px-2 py-0.5 text-xs rounded ${stage >= 2 ? (currentPosition >= 3 ? 'bg-green-100 dark:bg-green-900' : 'bg-blue-100 dark:bg-blue-900') : 'bg-slate-100 dark:bg-slate-800'}`}>Stage 3: 8x</div>
+          <div className={`px-2 py-0.5 text-xs rounded ${stage >= 3 ? (currentPosition >= 4 ? 'bg-green-100 dark:bg-green-900 font-bold' : 'bg-blue-100 dark:bg-blue-900') : 'bg-slate-100 dark:bg-slate-800'}`}>Stage 4: 20x</div>
         </div>
       </div>
       
-      {/* Current stage display */}
-      <div className="w-full text-center mb-4">
-        <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-3 py-1 rounded-full text-sm font-medium">
-          Stage {stage + 1}: {stageNames[stage]}
-        </span>
+      {/* Current stage indicator */}
+      <div className="w-full mb-4">
+        <div className="text-center text-sm font-semibold">
+          Current Stage: {getStageName(stage)}
+        </div>
+        
+        {/* Progress bar showing all 4 stages */}
+        <div className="w-full bg-gray-200 dark:bg-gray-800 h-2 rounded-full mt-2 overflow-hidden">
+          <div 
+            className="bg-gradient-to-r from-blue-500 to-purple-600 h-full rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${(stage / 3) * 100}%` }}
+          />
+        </div>
       </div>
       
       {/* Combined cards layout - more compact */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
         {/* Current card */}
         {currentCard && (
           <div className="flex flex-col items-center">
@@ -88,8 +101,8 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
         
         {/* Cards in play - linear arrangement */}
         <div className="flex flex-col items-center">
-          <div className="text-center mb-1 text-xs font-medium">Cards in Play</div>
-          <div className="flex justify-center space-x-2">
+          <div className="text-center mb-1 text-xs font-medium">Your Cards</div>
+          <div className="flex justify-center space-x-3">
             {cardsInPlay.map((card, index) => (
               <div key={`card-${index}`} className="relative">
                 {card ? (
@@ -99,16 +112,24 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
                     transition={{ type: "spring", damping: 12, delay: 0.1 * index }}
                   >
                     <Card card={card} faceUp={true} scale={cardScale} />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center">
+                    <div 
+                      className={`absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs flex items-center justify-center ${
+                        index <= stage ? 'bg-blue-500' : 'bg-gray-400'
+                      }`}
+                    >
                       {index + 1}
                     </div>
                   </motion.div>
                 ) : (
                   <div className="w-[40px] h-[56px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative">
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gray-300 text-white text-xs flex items-center justify-center">
+                    <div 
+                      className={`absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs flex items-center justify-center ${
+                        index <= stage ? 'bg-blue-500' : 'bg-gray-400'
+                      }`}
+                    >
                       {index + 1}
                     </div>
-                    {currentPosition + 1 === index && (
+                    {currentPosition === index && (
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
                     )}
                   </div>
@@ -119,8 +140,8 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
         </div>
       </div>
       
-      {/* Game completion status - smaller and more compact */}
-      {completedPositions === 4 && (
+      {/* Game completion status - if won the game */}
+      {currentPosition === 4 && (
         <motion.div 
           className="mt-3 p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-md font-bold text-center text-xs sm:text-sm"
           initial={{ opacity: 0, y: 20 }}
@@ -128,7 +149,7 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet, stage }: Ga
           transition={{ delay: 0.5 }}
         >
           <div className="text-base sm:text-lg mb-0.5">🎉 JACKPOT! 🎉</div>
-          <div>Congratulations! You rode the entire bus and won 20x your bet!</div>
+          <div>Congratulations! You completed all 4 stages and won {payoutMultiplier}x your bet!</div>
         </motion.div>
       )}
     </div>

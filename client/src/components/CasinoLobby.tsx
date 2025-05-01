@@ -218,7 +218,7 @@ const CasinoLobby = () => {
                       <div className="h-12 w-10 sm:h-14 sm:w-12 border border-slate-300 rounded-md bg-white shadow flex items-center justify-center text-red-600 text-base sm:text-lg font-bold">♦</div>
                     </div>
                   </div>
-                  <div className="text-center text-xs text-slate-500 mt-1">Coming soon!</div>
+                  <div className="text-center text-xs text-slate-500 mt-1">Complete all 4 stages to win 20x!</div>
                 </CasinoCardContent>
                 <CasinoCardFooter className="p-4 sm:p-6 pt-2 sm:pt-3">
                   <CasinoButton 
