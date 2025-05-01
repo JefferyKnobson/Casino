@@ -58,6 +58,29 @@ const SlotMachine = () => {
     placeSlotBet(amount);
   };
   
+  // Handle all-in bet
+  const handleAllIn = () => {
+    if (balance <= 0) {
+      toast.error("You don't have any money to bet!");
+      return;
+    }
+    
+    if (!isMuted) {
+      playSound("bet");
+      // For a big bet, add an extra sound
+      setTimeout(() => playSound("success", 0.7), 300);
+    }
+    
+    // Round down to nearest 5 for consistency with chip values
+    const allInAmount = Math.floor(balance / 5) * 5;
+    
+    // Safeguard to ensure we don't bet more than available
+    const betAmount = Math.min(allInAmount, balance);
+    
+    placeSlotBet(betAmount);
+    toast.success(`All in! Betting $${betAmount}`, { duration: 2000 });
+  };
+  
   // Handle spinning the reels
   const handleSpin = async () => {
     if (spinning || !slotMachine.bet) return;
@@ -150,6 +173,16 @@ const SlotMachine = () => {
           />
         ))}
       </div>
+      
+      {/* All In Button */}
+      <CasinoButton
+        variant="gold"
+        onClick={handleAllIn}
+        disabled={spinning || balance <= 0}
+        className="mb-3 animate-pulse"
+      >
+        All In (${Math.floor(balance / 5) * 5})
+      </CasinoButton>
       
       <CasinoButton
         variant="red"

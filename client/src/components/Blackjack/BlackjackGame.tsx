@@ -250,6 +250,18 @@ const BlackjackGame = () => {
       <div className="text-center text-gray-600 dark:text-gray-400 mt-3 sm:mt-4 text-sm sm:text-base">
         Click on a chip to place your bet
       </div>
+      
+      <div className="mt-4">
+        <CasinoButton
+          variant="red"
+          size="lg"
+          onClick={handleAllIn}
+          disabled={balance <= 0}
+          className="animate-pulse"
+        >
+          All In (${Math.floor(balance / 5) * 5})
+        </CasinoButton>
+      </div>
     </div>
   );
   
