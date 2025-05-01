@@ -13,7 +13,7 @@ import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
 
 // Function to calculate the payout based on the number of correct guesses (position)
-const calculateRoundTheBusPayout = (state: any) => {
+const calculateRideTheBusPayout = (state: any) => {
   const { currentPosition, bet, gamePhase } = state;
   
   if (gamePhase !== "finished") return 0;
@@ -23,10 +23,10 @@ const calculateRoundTheBusPayout = (state: any) => {
   
   // Calculate based on how many correct guesses the player made
   switch (currentPosition) {
-    case 1: return bet * 2;   // 1 correct guess: 2x
-    case 2: return bet * 4;   // 2 correct guesses: 4x
-    case 3: return bet * 8;   // 3 correct guesses: 8x
-    case 4: return bet * 10;  // All 4 correct guesses: 10x
+    case 1: return Math.floor(bet * 1.5);   // 1 correct guess: 1.5x
+    case 2: return bet * 3;                 // 2 correct guesses: 3x
+    case 3: return bet * 6;                 // 3 correct guesses: 6x
+    case 4: return bet * 12;                // All 4 correct guesses (ride the whole bus): 12x
     default: return 0;
   }
 };
@@ -64,7 +64,7 @@ const RoundTheBusGame = () => {
   // Check for game completion when phase changes to finished
   useEffect(() => {
     if (roundTheBus.gamePhase === "finished") {
-      const payout = calculateRoundTheBusPayout(roundTheBus);
+      const payout = calculateRideTheBusPayout(roundTheBus);
       const netWinnings = payout - roundTheBus.bet;
       
       // Play appropriate sound
@@ -81,7 +81,7 @@ const RoundTheBusGame = () => {
       
       // Record in history
       const result = payout > 0 ? "win" : "loss";
-      addToHistory("round-the-bus", netWinnings, result);
+      addToHistory("ride-the-bus", netWinnings, result);
       
       // Show animation for wins
       if (payout > 0) {
@@ -205,12 +205,12 @@ const RoundTheBusGame = () => {
     <div className="max-w-4xl mx-auto pt-6">
       <CasinoCard gradient="green" bordered className="mb-6">
         <CasinoCardHeader>
-          <CasinoCardTitle>Round the Bus</CasinoCardTitle>
+          <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
         </CasinoCardHeader>
         <CasinoCardContent>
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             <p>Guess if the next card will be higher or lower than the current one. Same value is a loss.</p>
-            <p>Successfully complete all rounds to win up to 10x your bet!</p>
+            <p>Ride the bus through all 4 cards to win big! Each correct guess increases your potential payout.</p>
           </div>
         </CasinoCardContent>
       </CasinoCard>

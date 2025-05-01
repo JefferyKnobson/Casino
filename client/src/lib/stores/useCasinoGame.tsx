@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 
-export type GameType = "blackjack" | "round-the-bus" | "slots" | null;
+export type GameType = "blackjack" | "round-the-bus" | "ride-the-bus" | "slots" | null;
 
 interface CasinoGameState {
   balance: number;

@@ -83,12 +83,12 @@ const CasinoLobby = () => {
         
         <CasinoCard gradient="green" bordered elevated className="flex flex-col h-full">
           <CasinoCardHeader className="p-4 sm:p-6">
-            <CasinoCardTitle>Round the Bus</CasinoCardTitle>
+            <CasinoCardTitle>Ride the Bus</CasinoCardTitle>
           </CasinoCardHeader>
           <CasinoCardContent className="flex-1 p-4 sm:p-6">
             <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm sm:text-base">
               Guess if the next card will be higher or lower than the current one.
-              Complete all rounds to win up to 10x your bet!
+              Complete all 4 cards to win up to 12x your bet!
             </p>
             <div className="flex justify-center my-3 sm:my-4">
               <div className="flex flex-col items-center space-y-1">
@@ -111,9 +111,9 @@ const CasinoLobby = () => {
             <CasinoButton 
               variant="green" 
               className="w-full" 
-              onClick={() => handleSelectGame("round-the-bus")}
+              onClick={() => handleSelectGame("ride-the-bus")}
             >
-              Play Round the Bus
+              Play Ride the Bus
             </CasinoButton>
           </CasinoCardFooter>
         </CasinoCard>
@@ -168,7 +168,8 @@ const CasinoLobby = () => {
                     <td className="py-1 sm:py-2 px-2 sm:px-4">{entry.time}</td>
                     <td className="py-1 sm:py-2 px-2 sm:px-4">
                       {entry.game === "blackjack" && "Blackjack"}
-                      {entry.game === "round-the-bus" && "Round the Bus"}
+                      {entry.game === "round-the-bus" && "Ride the Bus"}
+                      {entry.game === "ride-the-bus" && "Ride the Bus"}
                       {entry.game === "slots" && "Slots"}
                     </td>
                     <td className="py-1 sm:py-2 px-2 sm:px-4 text-right">${Math.abs(entry.amount)}</td>
