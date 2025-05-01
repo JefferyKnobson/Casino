@@ -22,11 +22,12 @@ const calculateRideTheBusPayout = (state: any) => {
   if (currentPosition === 0) return 0;
   
   // Calculate based on how many correct guesses the player made
+  // The final round (4th card) has the biggest payout jump
   switch (currentPosition) {
-    case 1: return Math.floor(bet * 1.5);   // 1 correct guess: 1.5x
-    case 2: return bet * 3;                 // 2 correct guesses: 3x
-    case 3: return bet * 6;                 // 3 correct guesses: 6x
-    case 4: return bet * 12;                // All 4 correct guesses (ride the whole bus): 12x
+    case 1: return bet * 2;          // 1st card correct: 2x
+    case 2: return bet * 4;          // 2nd card correct: 4x
+    case 3: return bet * 8;          // 3rd card correct: 8x
+    case 4: return bet * 20;         // Final card correct (completed the bus): 20x jackpot
     default: return 0;
   }
 };
@@ -210,7 +211,13 @@ const RideTheBusGame = () => {
         <CasinoCardContent>
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             <p>Guess if the next card will be higher or lower than the current one. Same value is a loss.</p>
-            <p>Ride the bus through all 4 cards to win big! Each correct guess increases your potential payout.</p>
+            <p>Payouts increase with each correct guess:</p>
+            <ul className="list-disc pl-5 mt-1 space-y-0.5">
+              <li>1st card: 2x your bet</li>
+              <li>2nd card: 4x your bet</li>
+              <li>3rd card: 8x your bet</li>
+              <li>4th card: 20x your bet (JACKPOT!)</li>
+            </ul>
           </div>
         </CasinoCardContent>
       </CasinoCard>

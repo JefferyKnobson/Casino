@@ -88,7 +88,7 @@ const CasinoLobby = () => {
           <CasinoCardContent className="flex-1 p-4 sm:p-6">
             <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm sm:text-base">
               Guess if the next card will be higher or lower than the current one.
-              Complete all 4 cards to win up to 12x your bet!
+              Complete all 4 cards to win up to 20x your bet! Each successful card doubles your potential winnings.
             </p>
             <div className="flex justify-center my-3 sm:my-4">
               <div className="flex flex-col items-center space-y-1">

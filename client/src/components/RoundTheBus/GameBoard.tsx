@@ -17,11 +17,11 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet }: GameBoard
   // Calculate payout multiplier based on completed rounds
   const getPayoutMultiplier = () => {
     switch (completedPositions) {
-      case 1: return 2;   // 1 correct guess: x2
-      case 2: return 4;   // 2 correct guesses: x4
-      case 3: return 8;   // 3 correct guesses: x8
-      case 4: return 10;  // All 4 correct guesses: x10
-      default: return 0;  // No completed positions
+      case 1: return 2;    // 1 correct guess: x2
+      case 2: return 4;    // 2 correct guesses: x4
+      case 3: return 8;    // 3 correct guesses: x8
+      case 4: return 20;   // All 4 correct guesses: x20
+      default: return 0;   // No completed positions
     }
   };
   
@@ -51,10 +51,10 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet }: GameBoard
       
       {/* Payout information */}
       <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs sm:text-sm">
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">1 Card: 2x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">2 Cards: 4x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">3 Cards: 8x</div>
-        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">4 Cards: 10x</div>
+        <div className={`px-2 py-1 rounded ${completedPositions >= 1 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>1st Card: 2x</div>
+        <div className={`px-2 py-1 rounded ${completedPositions >= 2 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>2nd Card: 4x</div>
+        <div className={`px-2 py-1 rounded ${completedPositions >= 3 ? 'bg-green-100 dark:bg-green-900' : 'bg-slate-100 dark:bg-slate-800'}`}>3rd Card: 8x</div>
+        <div className={`px-2 py-1 rounded ${completedPositions >= 4 ? 'bg-green-100 dark:bg-green-900 font-bold' : 'bg-slate-100 dark:bg-slate-800'}`}>4th Card: 20x</div>
       </div>
       
       {/* Current card and cards in play in a linear layout */}
@@ -109,12 +109,13 @@ const GameBoard = ({ cardsInPlay, currentCard, currentPosition, bet }: GameBoard
       {/* Game completion status */}
       {completedPositions === 4 && (
         <motion.div 
-          className="mt-4 p-2 bg-green-100 text-green-800 rounded-md font-bold text-sm sm:text-base"
+          className="mt-4 p-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-md font-bold text-center text-sm sm:text-base"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          Congratulations! You completed all rounds!
+          <div className="text-lg sm:text-xl mb-1">🎉 JACKPOT! 🎉</div>
+          <div>Congratulations! You rode the entire bus and won 20x your bet!</div>
         </motion.div>
       )}
     </div>
