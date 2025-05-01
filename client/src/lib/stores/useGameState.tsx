@@ -179,6 +179,7 @@ export const useGameState = create<GameState>((set, get) => {
   blackjack: initialBlackjackState,
   roundTheBus: initialRoundTheBusState,
   slotMachine: initialSlotMachineState,
+  rideTheBus: initialRideTheBusState,
   
   // Blackjack actions
   initBlackjack: () => {
@@ -710,6 +711,506 @@ export const useGameState = create<GameState>((set, get) => {
     });
   },
   
+  // Ride the Bus actions
+  initRideTheBus: () => {
+    set({
+      rideTheBus: {
+        ...initialRideTheBusState,
+        deck: createDeck(),
+      }
+    });
+  },
+  
+  placeRideTheBusBet: (amount: number) => {
+    const { rideTheBus } = get();
+    const { deck } = rideTheBus;
+    
+    // Draw the first card and place it at position 0
+    const firstCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Set up the first card revealed, we're at stage 0 (Red/Black)
+    const cardsInPlay = [firstCard, null, null, null];
+    
+    set({
+      rideTheBus: {
+        ...rideTheBus,
+        deck: newDeck,
+        cardsInPlay,
+        currentCard: firstCard,
+        currentPosition: 0,
+        stage: 0,
+        bet: amount,
+        gamePhase: "playing",
+      }
+    });
+  },
+  
+  // Stage 0: Red or Black guess
+  chooseRed: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 0) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (is red)
+    const isRed = nextCard.suit === "hearts" || nextCard.suit === "diamonds";
+    const correct = isRed;
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[1] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 1,
+          stage: 1, // Move to higher/lower stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "red" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "red-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  chooseBlack: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 0) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (is black)
+    const isBlack = nextCard.suit === "clubs" || nextCard.suit === "spades";
+    const correct = isBlack;
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[1] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 1,
+          stage: 1, // Move to higher/lower stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "black" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "black-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  // Stage 1: Higher or Lower
+  chooseHigherRide: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 1) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (higher than current)
+    const correct = nextCard.value > currentCard.value;
+    
+    // If cards are equal, the player loses
+    if (nextCard.value === currentCard.value) {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "higher-same" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[2] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 2,
+          stage: 2, // Move to inside/outside stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "higher" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "higher-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  chooseLowerRide: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 1) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Determine if the guess was correct (lower than current)
+    const correct = nextCard.value < currentCard.value;
+    
+    // If cards are equal, the player loses
+    if (nextCard.value === currentCard.value) {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "lower-same" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[2] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 2,
+          stage: 2, // Move to inside/outside stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "lower" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "lower-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  // Stage 2: Inside or Outside
+  chooseInside: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 2) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Get the first and second card
+    const firstCard = cardsInPlay[0]; 
+    const secondCard = cardsInPlay[1];
+    
+    if (!firstCard || !secondCard) {
+      return false;
+    }
+    
+    // Determine range (sort values to get min and max)
+    const values = [firstCard.value, secondCard.value].sort((a, b) => a - b);
+    const min = values[0];
+    const max = values[1];
+    
+    // Determine if the guess was correct (inside the range)
+    const correct = nextCard.value > min && nextCard.value < max;
+    
+    // Handle equal value
+    if (nextCard.value === min || nextCard.value === max) {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "inside-same" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[3] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 3,
+          stage: 3, // Move to suit stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "inside" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "inside-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  chooseOutside: () => {
+    const { rideTheBus } = get();
+    const { deck, cardsInPlay, currentCard, stage, gamePhase } = rideTheBus;
+    
+    if (!currentCard || gamePhase !== "playing" || stage !== 2) {
+      return false;
+    }
+    
+    // Draw the next card
+    const nextCard = { ...deck[0], faceUp: true };
+    const newDeck = deck.slice(1);
+    
+    // Get the first and second card
+    const firstCard = cardsInPlay[0]; 
+    const secondCard = cardsInPlay[1];
+    
+    if (!firstCard || !secondCard) {
+      return false;
+    }
+    
+    // Determine range (sort values to get min and max)
+    const values = [firstCard.value, secondCard.value].sort((a, b) => a - b);
+    const min = values[0];
+    const max = values[1];
+    
+    // Determine if the guess was correct (outside the range)
+    const correct = nextCard.value < min || nextCard.value > max;
+    
+    // Handle equal value
+    if (nextCard.value === min || nextCard.value === max) {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "outside-same" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      return false;
+    }
+    
+    // Process result based on whether guess was correct
+    if (correct) {
+      // Set up for the next stage
+      const updatedCardsInPlay = [...cardsInPlay];
+      updatedCardsInPlay[3] = nextCard;
+      
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          cardsInPlay: updatedCardsInPlay,
+          currentCard: nextCard,
+          currentPosition: 3,
+          stage: 3, // Move to suit stage
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "outside" 
+          }],
+        }
+      });
+      
+      return true;
+    } else {
+      // Game over - incorrect guess
+      set({
+        rideTheBus: {
+          ...rideTheBus,
+          deck: newDeck,
+          currentCard: nextCard,
+          history: [...rideTheBus.history, { 
+            card: nextCard, 
+            result: "outside-incorrect" 
+          }],
+          gamePhase: "finished"
+        }
+      });
+      
+      return false;
+    }
+  },
+  
+  // Stage 3: Guess the Suit
+  chooseHearts: () => {
+    return guessSuit(get, set, "hearts");
+  },
+  
+  chooseDiamonds: () => {
+    return guessSuit(get, set, "diamonds");
+  },
+  
+  chooseClubs: () => {
+    return guessSuit(get, set, "clubs");
+  },
+  
+  chooseSpades: () => {
+    return guessSuit(get, set, "spades");
+  },
+  
+  resetRideTheBus: () => {
+    set({
+      rideTheBus: {
+        ...initialRideTheBusState,
+        deck: createDeck(),
+      }
+    });
+  },
+  
   // Slot machine actions
   initSlotMachine: () => {
     set({
@@ -886,6 +1387,59 @@ function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
 // Helper to get card's numerical value for comparing
 function cardValue(card: Card): number {
   return card.value;
+}
+
+// Utility function for guessing suit in Ride the Bus
+function guessSuit(
+  get: () => GameState, 
+  set: (state: Partial<GameState>) => void, 
+  suitGuess: "hearts" | "diamonds" | "clubs" | "spades"
+): boolean {
+  const { rideTheBus } = get();
+  const { deck, stage, gamePhase } = rideTheBus;
+  
+  if (gamePhase !== "playing" || stage !== 3) {
+    return false;
+  }
+  
+  // Draw the final card
+  const finalCard = { ...deck[0], faceUp: true };
+  const newDeck = deck.slice(1);
+  
+  // Determine if the guess was correct
+  const correct = finalCard.suit === suitGuess;
+  
+  if (correct) {
+    // Player won the game!
+    set({
+      rideTheBus: {
+        ...rideTheBus,
+        deck: newDeck,
+        currentCard: finalCard,
+        history: [...rideTheBus.history, { 
+          card: finalCard, 
+          result: `${suitGuess}-correct` 
+        }],
+        gamePhase: "finished"
+      }
+    });
+    return true;
+  } else {
+    // Game over - incorrect suit guess
+    set({
+      rideTheBus: {
+        ...rideTheBus,
+        deck: newDeck,
+        currentCard: finalCard,
+        history: [...rideTheBus.history, { 
+          card: finalCard, 
+          result: `${suitGuess}-incorrect` 
+        }],
+        gamePhase: "finished"
+      }
+    });
+    return false;
+  }
 }
 
 // Calculate slot machine winnings
