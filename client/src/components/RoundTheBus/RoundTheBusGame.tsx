@@ -152,7 +152,7 @@ const RoundTheBusGame = () => {
         <CasinoCardContent>
           <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             <p>Guess if the next card will be higher or lower than the current one. Same value is a loss.</p>
-            <p>Complete the pyramid to win up to 3x your bet!</p>
+            <p>Successfully complete all rounds to win up to 10x your bet!</p>
           </div>
         </CasinoCardContent>
       </CasinoCard>

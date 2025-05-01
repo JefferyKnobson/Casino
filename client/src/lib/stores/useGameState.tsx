@@ -135,7 +135,8 @@ const shuffleDeck = (deck: Card[]): Card[] => {
   return newDeck;
 };
 
-export const useGameState = create<GameState>((set, get) => ({
+export const useGameState = create<GameState>((set, get) => {
+  const store = {
   blackjack: initialBlackjackState,
   roundTheBus: initialRoundTheBusState,
   slotMachine: initialSlotMachineState,
@@ -529,10 +530,11 @@ export const useGameState = create<GameState>((set, get) => ({
     }));
   },
   
-  spinSlotMachine: async () => {
-    const { slotMachine } = get();
+  spinSlotMachine: async function() {
+    const state = this.getState();
+    const { slotMachine } = state;
     
-    set({
+    this.setState({
       slotMachine: {
         ...slotMachine,
         spinning: true,
@@ -555,7 +557,7 @@ export const useGameState = create<GameState>((set, get) => ({
     const result = { symbols, winAmount, winLines };
     
     // Update state with result
-    set({
+    this.setState({
       slotMachine: {
         ...slotMachine,
         spinning: false,
@@ -570,8 +572,11 @@ export const useGameState = create<GameState>((set, get) => ({
     set({
       slotMachine: initialSlotMachineState
     });
-  },
-}));
+  }
+  };
+  
+  return store;
+});
 
 // Helper functions
 
