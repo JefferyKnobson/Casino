@@ -32,10 +32,17 @@ export const useCasinoGame = create<CasinoGameState>()(
       balance: 250, // Starting balance
       isBroke: false,
       activeGame: null,
+      startTime: Date.now(), // Track when the session started
       gameHistory: [],
       
       init: () => {
-        // Initialization logic if needed
+        // Set the initial start time if not already set
+        set(state => {
+          if (!state.startTime) {
+            return { startTime: Date.now() };
+          }
+          return {};
+        });
         console.log("Casino game initialized");
       },
       
@@ -89,6 +96,13 @@ export const useCasinoGame = create<CasinoGameState>()(
         }
         
         return isBroke;
+      },
+      
+      getTimePlayed: () => {
+        const { startTime } = get();
+        // Calculate time difference in seconds
+        const timePlayedInSeconds = Math.floor((Date.now() - startTime) / 1000);
+        return timePlayedInSeconds;
       }
     }),
     {
@@ -96,7 +110,8 @@ export const useCasinoGame = create<CasinoGameState>()(
       partialize: (state) => ({ 
         balance: state.balance,
         isBroke: state.isBroke,
-        gameHistory: state.gameHistory 
+        gameHistory: state.gameHistory,
+        startTime: state.startTime
       })
     }
   )

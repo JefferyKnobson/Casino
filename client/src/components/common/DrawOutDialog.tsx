@@ -1,19 +1,20 @@
-import { useState } from "react";
-import { addLeaderboardEntry } from "../../lib/api/leaderboard";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useState } from 'react';
 import { 
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogDescription,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCasinoGame } from "../../lib/stores/useCasinoGame";
+  DialogFooter
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { useCasinoGame } from '../../lib/stores/useCasinoGame';
+import { formatDuration } from '../../lib/utils';
+import { Trophy, Clock, DollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface DrawOutDialogProps {
   open: boolean;
@@ -22,99 +23,110 @@ interface DrawOutDialogProps {
 }
 
 const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) => {
-  const [playerName, setPlayerName] = useState("");
-  const { balance, resetBalance } = useCasinoGame();
-  const queryClient = useQueryClient();
+  const [playerName, setPlayerName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { balance } = useCasinoGame();
+  const navigate = useNavigate();
   
-  const { mutate, isPending } = useMutation({
-    mutationFn: addLeaderboardEntry,
-    onSuccess: () => {
-      toast.success("Score saved to leaderboard!");
-      // Reset player's balance to starting amount
-      resetBalance();
-      // Invalidate the leaderboard cache to refresh it
-      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      console.error("Failed to save score:", error);
-      toast.error("Failed to save your score. Please try again.");
-    }
-  });
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!playerName.trim()) {
-      toast.error("Please enter your name");
+      toast.error('Please enter your name');
       return;
     }
     
-    mutate({
-      playerName: playerName.trim(),
-      score: balance,
-      timeTaken: timePlayed
-    });
+    setIsSubmitting(true);
+    
+    try {
+      // Submit to leaderboard API
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          playerName: playerName.trim(),
+          score: balance,
+          timeTaken: timePlayed
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit score');
+      }
+      
+      // Success!
+      toast.success('Your score has been recorded on the leaderboard!');
+      onOpenChange(false);
+      
+      // Navigate to leaderboard tab
+      setTimeout(() => {
+        navigate('/', { state: { openLeaderboard: true } });
+      }, 500);
+    } catch (error) {
+      console.error('Error submitting score:', error);
+      toast.error('There was a problem submitting your score. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Cash Out</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Trophy className="h-5 w-5 text-yellow-500" />
+            Draw Out Your Winnings
+          </DialogTitle>
           <DialogDescription>
-            Save your score to the leaderboard and start a new game.
+            Record your score on the leaderboard and cash out your winnings.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Current Balance:</span>
-              <span className="font-bold text-green-600">${balance}</span>
+        <div className="grid gap-4 py-4">
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <DollarSign className="h-3 w-3" /> Your Balance
+                </span>
+                <span className="text-2xl font-bold text-green-600">${balance}</span>
+              </div>
+              
+              <div className="flex flex-col gap-1 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <Clock className="h-3 w-3" /> Time Played
+                </span>
+                <span className="text-lg font-medium">{formatDuration(timePlayed)}</span>
+              </div>
             </div>
             
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Time Played:</span>
-              <span className="font-medium">
-                {Math.floor(timePlayed / 60)}m {timePlayed % 60}s
-              </span>
+            <div className="grid gap-2">
+              <Label htmlFor="playerName">Your Name</Label>
+              <Input
+                id="playerName"
+                placeholder="Enter your name"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                className="col-span-3"
+              />
             </div>
           </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           
-          <div className="space-y-2">
-            <label htmlFor="playerName" className="text-sm font-medium">
-              Your Name
-            </label>
-            <Input
-              id="playerName"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Enter your name"
-              maxLength={20}
-              required
-              autoFocus
-              className="col-span-3"
-            />
-          </div>
-          
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              type="button"
-              disabled={isPending}
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit"
-              disabled={isPending || !playerName.trim()}
-            >
-              {isPending ? "Saving..." : "Save Score"}
-            </Button>
-          </DialogFooter>
-        </form>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={isSubmitting || !playerName.trim()}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            {isSubmitting ? 'Submitting...' : 'Save Score & Exit'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
