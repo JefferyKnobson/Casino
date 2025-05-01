@@ -5,7 +5,7 @@ import { useCasinoGame } from "./lib/stores/useCasinoGame";
 import Layout from "./components/Layout";
 import CasinoLobby from "./components/CasinoLobby";
 import BlackjackGame from "./components/Blackjack/BlackjackGame";
-import RoundTheBusGame from "./components/RoundTheBus/RoundTheBusGame";
+import RideTheBusGame from "./components/RoundTheBus/RoundTheBusGame";
 import SlotMachine from "./components/SlotMachine/SlotMachine";
 import NotFound from "./pages/not-found";
 import { initAudio } from "./lib/utils/audio";
@@ -53,7 +53,8 @@ function App() {
           <Routes>
             <Route path="/" element={<CasinoLobby />} />
             <Route path="/blackjack" element={<BlackjackGame />} />
-            <Route path="/round-the-bus" element={<RoundTheBusGame />} />
+            <Route path="/ride-the-bus" element={<RideTheBusGame />} />
+            <Route path="/round-the-bus" element={<RideTheBusGame />} />  {/* Keep old route for backwards compatibility */}
             <Route path="/slots" element={<SlotMachine />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

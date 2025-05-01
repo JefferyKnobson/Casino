@@ -31,7 +31,7 @@ const calculateRideTheBusPayout = (state: any) => {
   }
 };
 
-const RoundTheBusGame = () => {
+const RideTheBusGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -89,7 +89,7 @@ const RoundTheBusGame = () => {
         setShowAnimation(true);
         
         // Check if win is significant enough for confetti celebration
-        // Round the Bus can have very high payouts, especially for a full run
+        // Ride the Bus can have very high payouts, especially for a full run
         const celebration = shouldTriggerCelebration(payout, roundTheBus.bet);
         
         if (celebration.trigger) {
@@ -304,4 +304,4 @@ const RoundTheBusGame = () => {
   );
 };
 
-export default RoundTheBusGame;
+export default RideTheBusGame;

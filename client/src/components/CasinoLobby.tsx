@@ -17,7 +17,7 @@ const CasinoLobby = () => {
     setGame(null);
   }, [setGame]);
 
-  const handleSelectGame = (game: "blackjack" | "round-the-bus" | "slots") => {
+  const handleSelectGame = (game: "blackjack" | "round-the-bus" | "ride-the-bus" | "slots") => {
     if (!isMuted) {
       playSound("hit");
     }
