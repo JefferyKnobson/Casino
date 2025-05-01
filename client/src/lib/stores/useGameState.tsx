@@ -21,9 +21,13 @@ interface BlackjackState {
 // Round the Bus specific state
 interface RoundTheBusState {
   deck: Card[];
-  pyramid: (Card | null)[][];
+  // In true Round the Bus, we have a row of 4 cards laid out with positions for:
+  // position 0: start card (automatically dealt)
+  // positions 1-3: player must guess correctly to reveal these cards 
+  // position 4: final card (only revealed if all previous cards were guessed correctly)
+  cardsInPlay: (Card | null)[];
+  currentPosition: number; // 0-4 representing which card we're at in the sequence
   currentCard: Card | null;
-  currentLevel: number;
   bet: number;
   history: { card: Card; result: "higher" | "lower" | "same" }[];
   gamePhase: "betting" | "playing" | "finished";
@@ -89,13 +93,9 @@ const initialBlackjackState: BlackjackState = {
 
 const initialRoundTheBusState: RoundTheBusState = {
   deck: [],
-  pyramid: [
-    [null, null, null],
-    [null, null],
-    [null],
-  ],
+  cardsInPlay: [null, null, null, null, null],
+  currentPosition: 0,
   currentCard: null,
-  currentLevel: 0,
   bet: 0,
   history: [],
   gamePhase: "betting",
@@ -470,27 +470,24 @@ export const useGameState = create<GameState>((set, get) => {
     });
   },
   
-  placeBusRoundBet: (amount) => {
+  placeBusRoundBet: (amount: number) => {
     const { roundTheBus } = get();
     const { deck } = roundTheBus;
     
-    // Draw the first card
+    // Draw the first card and place it at position 0
     const firstCard = { ...deck[0], faceUp: true };
     const newDeck = deck.slice(1);
     
-    // Update the first level of the pyramid
-    const pyramid = [
-      [firstCard, null, null],
-      [null, null],
-      [null],
-    ];
+    // Set up the cards in play with the first card revealed
+    const cardsInPlay = [firstCard, null, null, null, null];
     
     set({
       roundTheBus: {
         ...roundTheBus,
         deck: newDeck,
-        pyramid,
+        cardsInPlay,
         currentCard: firstCard,
+        currentPosition: 0,
         bet: amount,
         gamePhase: "playing",
       }
@@ -498,11 +495,10 @@ export const useGameState = create<GameState>((set, get) => {
   },
   
   chooseHigher: () => {
-    const state = get();
-    const { roundTheBus } = state;
-    const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
+    const { roundTheBus } = get();
+    const { deck, cardsInPlay, currentCard, currentPosition, gamePhase } = roundTheBus;
     
-    if (!currentCard || roundTheBus.gamePhase !== "playing") {
+    if (!currentCard || gamePhase !== "playing") {
       return false;
     }
     
@@ -533,36 +529,16 @@ export const useGameState = create<GameState>((set, get) => {
     
     // Process result based on whether guess was correct
     if (correct) {
-      // Update progress based on current level
-      let nextLevel = currentLevel;
+      // Update progress based on current position
+      const nextPosition = currentPosition + 1;
       let nextPhase = "playing";
-      const updatedPyramid = [...pyramid];
+      const updatedCardsInPlay = [...cardsInPlay];
       
-      // Handle successful guess
-      if (currentLevel === 0) {
-        // First level (3 cards)
-        const emptySlotIndex = updatedPyramid[0].findIndex(card => card === null);
-        if (emptySlotIndex !== -1) {
-          updatedPyramid[0][emptySlotIndex] = nextCard;
-          // If this was the last card in the level, move to the next level
-          if (updatedPyramid[0].every(card => card !== null)) {
-            nextLevel = 1;
-          }
-        }
-      } else if (currentLevel === 1) {
-        // Second level (2 cards)
-        const emptySlotIndex = updatedPyramid[1].findIndex(card => card === null);
-        if (emptySlotIndex !== -1) {
-          updatedPyramid[1][emptySlotIndex] = nextCard;
-          // If this was the last card in the level, move to the next level
-          if (updatedPyramid[1].every(card => card !== null)) {
-            nextLevel = 2;
-          }
-        }
-      } else if (currentLevel === 2) {
-        // Third level (1 card)
-        updatedPyramid[2][0] = nextCard;
-        // Game completed successfully
+      // Place the next card in the appropriate position
+      updatedCardsInPlay[nextPosition] = nextCard;
+      
+      // Check if we've reached the end of the game
+      if (nextPosition >= 4) {
         nextPhase = "finished";
       }
       
@@ -571,9 +547,9 @@ export const useGameState = create<GameState>((set, get) => {
         roundTheBus: {
           ...roundTheBus,
           deck: newDeck,
-          pyramid: updatedPyramid,
+          cardsInPlay: updatedCardsInPlay,
           currentCard: nextCard,
-          currentLevel: nextLevel,
+          currentPosition: nextPosition,
           history: [...roundTheBus.history, { 
             card: nextCard, 
             result: "higher" 
@@ -603,11 +579,10 @@ export const useGameState = create<GameState>((set, get) => {
   },
   
   chooseLower: () => {
-    const state = get();
-    const { roundTheBus } = state;
-    const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
+    const { roundTheBus } = get();
+    const { deck, cardsInPlay, currentCard, currentPosition, gamePhase } = roundTheBus;
     
-    if (!currentCard || roundTheBus.gamePhase !== "playing") {
+    if (!currentCard || gamePhase !== "playing") {
       return false;
     }
     
@@ -638,36 +613,16 @@ export const useGameState = create<GameState>((set, get) => {
     
     // Process result based on whether guess was correct
     if (correct) {
-      // Update progress based on current level
-      let nextLevel = currentLevel;
+      // Update progress based on current position
+      const nextPosition = currentPosition + 1;
       let nextPhase = "playing";
-      const updatedPyramid = [...pyramid];
+      const updatedCardsInPlay = [...cardsInPlay];
       
-      // Handle successful guess
-      if (currentLevel === 0) {
-        // First level (3 cards)
-        const emptySlotIndex = updatedPyramid[0].findIndex(card => card === null);
-        if (emptySlotIndex !== -1) {
-          updatedPyramid[0][emptySlotIndex] = nextCard;
-          // If this was the last card in the level, move to the next level
-          if (updatedPyramid[0].every(card => card !== null)) {
-            nextLevel = 1;
-          }
-        }
-      } else if (currentLevel === 1) {
-        // Second level (2 cards)
-        const emptySlotIndex = updatedPyramid[1].findIndex(card => card === null);
-        if (emptySlotIndex !== -1) {
-          updatedPyramid[1][emptySlotIndex] = nextCard;
-          // If this was the last card in the level, move to the next level
-          if (updatedPyramid[1].every(card => card !== null)) {
-            nextLevel = 2;
-          }
-        }
-      } else if (currentLevel === 2) {
-        // Third level (1 card)
-        updatedPyramid[2][0] = nextCard;
-        // Game completed successfully
+      // Place the next card in the appropriate position
+      updatedCardsInPlay[nextPosition] = nextCard;
+      
+      // Check if we've reached the end of the game
+      if (nextPosition >= 4) {
         nextPhase = "finished";
       }
       
@@ -676,9 +631,9 @@ export const useGameState = create<GameState>((set, get) => {
         roundTheBus: {
           ...roundTheBus,
           deck: newDeck,
-          pyramid: updatedPyramid,
+          cardsInPlay: updatedCardsInPlay,
           currentCard: nextCard,
-          currentLevel: nextLevel,
+          currentPosition: nextPosition,
           history: [...roundTheBus.history, { 
             card: nextCard, 
             result: "lower" 
@@ -811,12 +766,11 @@ function calculateHandValue(hand: Card[]): number {
 }
 
 // Round the Bus turn logic
-function playRoundTheBusTurn(this: any, choice: "higher" | "lower"): boolean {
-  // Access the state using this context
-  const { roundTheBus } = this.getState();
-  const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
+function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
+  const { roundTheBus } = get();
+  const { deck, cardsInPlay, currentCard, currentPosition, gamePhase } = roundTheBus;
   
-  if (!currentCard || roundTheBus.gamePhase !== "playing") {
+  if (!currentCard || gamePhase !== "playing") {
     return false;
   }
   
@@ -827,74 +781,63 @@ function playRoundTheBusTurn(this: any, choice: "higher" | "lower"): boolean {
   // Determine if the guess was correct
   let correct = false;
   if (choice === "higher") {
-    correct = cardValue(nextCard) > cardValue(currentCard);
+    correct = nextCard.value > currentCard.value;
   } else {
-    correct = cardValue(nextCard) < cardValue(currentCard);
+    correct = nextCard.value < currentCard.value;
   }
   
   // If cards are equal, the player loses
-  if (cardValue(nextCard) === cardValue(currentCard)) {
+  if (nextCard.value === currentCard.value) {
     correct = false;
   }
   
-  // Update the pyramid based on current level
-  const updatedPyramid = [...pyramid];
-  let nextLevel = currentLevel;
-  let nextPhase = roundTheBus.gamePhase;
+  if (!correct) {
+    // Game over - incorrect guess
+    set({
+      roundTheBus: {
+        ...roundTheBus,
+        deck: newDeck,
+        currentCard: nextCard,
+        gamePhase: "finished",
+        history: [...roundTheBus.history, { 
+          card: nextCard, 
+          result: "same" 
+        }]
+      }
+    });
+    return false;
+  }
   
-  if (correct) {
-    // Place card in the correct position of the current level
-    if (currentLevel === 0) {
-      // First level (3 cards)
-      const emptySlotIndex = updatedPyramid[0].findIndex(card => card === null);
-      if (emptySlotIndex !== -1) {
-        updatedPyramid[0][emptySlotIndex] = nextCard;
-        // If this was the last card in the level, move to the next level
-        if (updatedPyramid[0].every(card => card !== null)) {
-          nextLevel = 1;
-        }
-      }
-    } else if (currentLevel === 1) {
-      // Second level (2 cards)
-      const emptySlotIndex = updatedPyramid[1].findIndex(card => card === null);
-      if (emptySlotIndex !== -1) {
-        updatedPyramid[1][emptySlotIndex] = nextCard;
-        // If this was the last card in the level, move to the next level
-        if (updatedPyramid[1].every(card => card !== null)) {
-          nextLevel = 2;
-        }
-      }
-    } else if (currentLevel === 2) {
-      // Third level (1 card)
-      updatedPyramid[2][0] = nextCard;
-      // Game completed successfully
-      nextPhase = "finished";
-    }
-  } else {
-    // Incorrect guess, game over
+  // Handle successful guess
+  const nextPosition = currentPosition + 1;
+  let nextPhase = "playing";
+  const updatedCardsInPlay = [...cardsInPlay];
+  
+  // Place the next card in the appropriate position
+  updatedCardsInPlay[nextPosition] = nextCard;
+  
+  // Check if we've reached the end of the game
+  if (nextPosition >= 4) {
     nextPhase = "finished";
   }
   
-  // Add to history
-  const historyEntry = { 
-    card: nextCard, 
-    result: correct ? (choice as "higher" | "lower") : "same" 
-  };
-  
-  // Update state
-  this.setState({
+  // Update state with success
+  set({
     roundTheBus: {
       ...roundTheBus,
       deck: newDeck,
-      pyramid: updatedPyramid,
+      cardsInPlay: updatedCardsInPlay,
       currentCard: nextCard,
-      currentLevel: nextLevel,
-      history: [...roundTheBus.history, historyEntry],
-      gamePhase: nextPhase,
+      currentPosition: nextPosition,
+      history: [...roundTheBus.history, { 
+        card: nextCard, 
+        result: choice 
+      }],
+      gamePhase: nextPhase
     }
   });
   
-  return correct;
+  return true;
 }
 
 // Helper to get card's numerical value for comparing
