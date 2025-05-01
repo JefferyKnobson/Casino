@@ -24,7 +24,7 @@ const GameHUD = () => {
   }, [getTimePlayed]);
   
   const handleGoHome = () => {
-    navigate('/');
+    navigate('/', { state: { skipWelcome: true } });
   };
   
   const handleHelp = () => {

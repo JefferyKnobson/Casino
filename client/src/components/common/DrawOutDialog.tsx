@@ -52,9 +52,9 @@ const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) =
       // Reset balance and time
       resetBalance();
       
-      // Navigate to leaderboard tab
+      // Navigate to leaderboard tab while skipping welcome screen
       setTimeout(() => {
-        navigate('/', { state: { openLeaderboard: true } });
+        navigate('/', { state: { openLeaderboard: true, skipWelcome: true } });
       }, 500);
     } catch (error) {
       console.error('Error submitting score:', error);

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import { CasinoCard, CasinoCardContent, CasinoCardFooter, CasinoCardHeader, CasinoCardTitle } from "./ui/card-casino";
 import { CasinoButton } from "./ui/button-casino";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -13,6 +14,8 @@ const CasinoLobby = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("games");
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+  const gamesRef = useRef<HTMLDivElement>(null);
   const { setGame, balance, gameHistory, isBroke, resetBalance } = useCasinoGame();
   const { isMuted } = useAudio();
 
@@ -21,9 +24,16 @@ const CasinoLobby = () => {
     setGame(null);
     
     // Check if we should open the leaderboard tab from a navigation state
-    const state = location.state as { openLeaderboard?: boolean } | null;
+    const state = location.state as { openLeaderboard?: boolean, skipWelcome?: boolean } | null;
     if (state?.openLeaderboard) {
       setActiveTab("leaderboard");
+      // Clear the state
+      window.history.replaceState({}, document.title);
+    }
+    
+    // Skip welcome screen if coming from a game
+    if (state?.skipWelcome) {
+      setShowWelcomeScreen(false);
       // Clear the state
       window.history.replaceState({}, document.title);
     }
@@ -36,9 +46,66 @@ const CasinoLobby = () => {
     setGame(game);
     navigate(`/${game}`);
   };
+  
+  const handleScrollToGames = () => {
+    setShowWelcomeScreen(false);
+    
+    // Smooth scroll to games section
+    if (gamesRef.current) {
+      setTimeout(() => {
+        gamesRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+    
+    if (!isMuted) {
+      playSound("success");
+    }
+  };
 
+  if (showWelcomeScreen) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center px-4">
+        <div className="max-w-2xl w-full text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 sm:mb-8 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-red-500 to-purple-600">
+            Casino Desperado
+          </h1>
+          
+          <div className="mb-8 sm:mb-12 flex justify-center space-x-2">
+            <div className="h-16 w-12 sm:h-20 sm:w-14 border border-slate-300 rounded-md bg-white shadow transform rotate-[-10deg]">
+              <div className="text-red-600 text-xl font-bold m-1">A♥</div>
+            </div>
+            <div className="h-16 w-12 sm:h-20 sm:w-14 border border-slate-300 rounded-md bg-white shadow transform rotate-[5deg]">
+              <div className="text-black text-xl font-bold m-1">K♠</div>
+            </div>
+            <div className="h-16 w-12 sm:h-20 sm:w-14 border border-slate-300 rounded-md bg-white shadow transform rotate-[12deg]">
+              <div className="text-red-600 text-xl font-bold m-1">Q♦</div>
+            </div>
+          </div>
+          
+          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 sm:mb-10">
+            Welcome to the most exciting virtual casino!
+            <br />
+            Your current balance: <span className="font-bold text-primary">${balance}</span>
+          </p>
+          
+          <CasinoButton 
+            variant="gold" 
+            onClick={handleScrollToGames}
+            className="text-lg px-8 py-3 animate-pulse"
+          >
+            Enter Casino
+            <ChevronDown className="h-6 w-6 ml-2" />
+          </CasinoButton>
+        </div>
+      </div>
+    );
+  }
+  
   return (
-    <div className="max-w-full sm:max-w-6xl mx-auto pt-4 sm:pt-8 px-2">
+    <div className="max-w-full sm:max-w-6xl mx-auto pt-4 sm:pt-8 px-2" ref={gamesRef}>
       {/* Show GameOver when player is broke */}
       {isBroke && <GameOver />}
       

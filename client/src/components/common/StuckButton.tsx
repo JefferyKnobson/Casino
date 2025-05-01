@@ -18,8 +18,8 @@ const StuckButton = () => {
     // Reset the balance
     resetBalance();
     
-    // Navigate to home
-    navigate('/');
+    // Navigate to home with skipWelcome flag to bypass the welcome screen
+    navigate('/', { state: { skipWelcome: true } });
     
     // Close the modal
     setIsOpen(false);

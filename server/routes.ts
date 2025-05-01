@@ -8,8 +8,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Leaderboard API routes
   app.get('/api/leaderboard', async (req: Request, res: Response) => {
     try {
-      // Get top 5 leaderboard entries by default
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      // Get top 20 leaderboard entries by default for a better global leaderboard
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
       const entries = await storage.getTopLeaderboardEntries(limit);
       return res.json(entries);
     } catch (error) {
