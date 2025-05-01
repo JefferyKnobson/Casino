@@ -1,18 +1,36 @@
-import { apiRequest } from "../queryClient";
-import type { LeaderboardEntry, AddLeaderboardEntryParams } from "../types/leaderboard";
+import { apiRequest } from '../queryClient';
 
-// Fetch top N leaderboard entries
-export const fetchLeaderboard = async (limit: number = 5): Promise<LeaderboardEntry[]> => {
-  return apiRequest(`/api/leaderboard?limit=${limit}`, { method: 'GET' });
+// Define LeaderboardEntry type
+export interface LeaderboardEntry {
+  id: number;
+  playerName: string;
+  score: number;
+  timeTaken: number;
+  createdAt: string;
+}
+
+// Define the input for creating a new leaderboard entry
+export interface CreateLeaderboardEntry {
+  playerName: string;
+  score: number;
+  timeTaken: number;
+}
+
+// Get all leaderboard entries, sorted by score (highest first)
+export const getLeaderboardEntries = async (): Promise<LeaderboardEntry[]> => {
+  return apiRequest<LeaderboardEntry[]>({
+    url: '/api/leaderboard',
+    method: 'GET',
+  });
 };
 
-// Add a new leaderboard entry
-export const addLeaderboardEntry = async (entry: AddLeaderboardEntryParams): Promise<LeaderboardEntry> => {
-  return apiRequest('/api/leaderboard', {
+// Add a new entry to the leaderboard
+export const addLeaderboardEntry = async (
+  entry: CreateLeaderboardEntry
+): Promise<LeaderboardEntry> => {
+  return apiRequest<LeaderboardEntry>({
+    url: '/api/leaderboard',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(entry),
+    body: entry,
   });
 };

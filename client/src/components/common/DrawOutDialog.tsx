@@ -15,6 +15,7 @@ import { formatDuration } from '../../lib/utils';
 import { Trophy, Clock, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { addLeaderboardEntry } from '../../lib/api/leaderboard';
 
 interface DrawOutDialogProps {
   open: boolean;
@@ -38,21 +39,11 @@ const DrawOutDialog = ({ open, onOpenChange, timePlayed }: DrawOutDialogProps) =
     
     try {
       // Submit to leaderboard API
-      const response = await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          playerName: playerName.trim(),
-          score: balance,
-          timeTaken: timePlayed
-        }),
+      await addLeaderboardEntry({
+        playerName: playerName.trim(),
+        score: balance,
+        timeTaken: timePlayed
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to submit score');
-      }
       
       // Success!
       toast.success('Your score has been recorded on the leaderboard!');

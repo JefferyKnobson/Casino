@@ -1,115 +1,121 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchLeaderboard } from "../../lib/api/leaderboard";
-import type { LeaderboardEntry } from "../../lib/types/leaderboard";
-import { formatDistanceToNow } from "date-fns";
-import { Trophy, Clock } from "lucide-react";
-
-// Component to format time duration (seconds to MM:SS)
-const FormatTime = ({ seconds }: { seconds: number }) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return (
-    <span className="flex items-center gap-1">
-      <Clock className="h-4 w-4 text-slate-500" />
-      {minutes}m {remainingSeconds}s
-    </span>
-  );
-};
+import { useState, useEffect } from 'react';
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
+} from '../ui/table';
+import { Trophy, Clock, DollarSign, Loader2 } from 'lucide-react';
+import { formatDuration } from '../../lib/utils';
+import { Card } from '../ui/card';
+import { LeaderboardEntry, getLeaderboardEntries } from '../../lib/api/leaderboard';
 
 const LeaderboardTab = () => {
-  const [limit, setLimit] = useState(5);
-  
-  // Fetch leaderboard data
-  const { data: entries, isLoading, error, refetch } = useQuery<LeaderboardEntry[]>({
-    queryKey: ["leaderboard", limit],
-    queryFn: () => fetchLeaderboard(limit),
-  });
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Refresh leaderboard data periodically
   useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, 30000); // Refresh every 30 seconds
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const data = await getLeaderboardEntries();
+        setEntries(data);
+      } catch (err) {
+        console.error('Error fetching leaderboard:', err);
+        setError('Failed to load leaderboard. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    return () => clearInterval(interval);
-  }, [refetch]);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-8 w-8 border-4 border-green-500 rounded-full border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center p-8 text-red-500">
-        <p>Failed to load leaderboard data.</p>
-        <button 
-          onClick={() => refetch()} 
-          className="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
+    fetchLeaderboard();
+  }, []);
+  
+  // Calculate efficiency score (more points in less time = better)
+  const getEfficiencyScore = (score: number, time: number) => {
+    // Avoid division by zero
+    if (time <= 0) return 0;
+    
+    // Points per second, multiplied by 100 for readability
+    return ((score / time) * 100).toFixed(2);
+  };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md border border-slate-200 dark:border-slate-800 p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">Leaderboard</h2>
-      
-      <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-100 dark:bg-slate-800">
-            <tr>
-              <th className="p-3 text-left font-medium">#</th>
-              <th className="p-3 text-left font-medium">Player</th>
-              <th className="p-3 text-right font-medium">Score</th>
-              <th className="p-3 text-right font-medium">Time</th>
-              <th className="p-3 text-right font-medium">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-            {entries && entries.length > 0 ? (
-              entries.map((entry, index) => (
-                <tr key={entry.id} className={index === 0 ? "bg-amber-50 dark:bg-amber-900/20" : ""}>
-                  <td className="p-3">
-                    <div className="flex items-center gap-1">
-                      {index === 0 && <Trophy className="h-4 w-4 text-amber-500" />}
-                      {index + 1}
-                    </div>
-                  </td>
-                  <td className="p-3 font-medium">
-                    {entry.playerName}
-                  </td>
-                  <td className="p-3 text-right font-bold text-green-600 dark:text-green-400">
-                    ${entry.score}
-                  </td>
-                  <td className="p-3 text-right text-slate-600 dark:text-slate-400">
-                    <FormatTime seconds={entry.timeTaken} />
-                  </td>
-                  <td className="p-3 text-right text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                    {formatDistanceToNow(new Date(entry.createdAt), { addSuffix: true })}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-slate-500">
-                  No entries yet. Be the first to cash out!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+    <div className="my-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy className="h-6 w-6 text-yellow-500" />
+        <h2 className="text-2xl font-bold">Top Casino Players</h2>
       </div>
       
-      {entries && entries.length > 0 && (
-        <div className="mt-4 text-center text-sm text-slate-500">
-          Showing top {entries.length} players
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : error ? (
+        <Card className="p-8 text-center text-red-500">
+          {error}
+        </Card>
+      ) : entries.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-slate-500">No entries yet. Be the first to join the leaderboard!</p>
+        </Card>
+      ) : (
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12 text-center">Rank</TableHead>
+                <TableHead>Player</TableHead>
+                <TableHead className="text-right">
+                  <span className="flex items-center justify-end gap-1">
+                    <DollarSign className="h-4 w-4" />
+                    Score
+                  </span>
+                </TableHead>
+                <TableHead className="text-right">
+                  <span className="flex items-center justify-end gap-1">
+                    <Clock className="h-4 w-4" />
+                    Time
+                  </span>
+                </TableHead>
+                <TableHead className="text-right hidden md:table-cell">Efficiency</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {entries.map((entry, index) => (
+                <TableRow key={entry.id} className={index < 3 ? "bg-amber-50 dark:bg-amber-950/20" : ""}>
+                  <TableCell className="font-medium text-center">
+                    {index === 0 ? (
+                      <Trophy className="h-5 w-5 text-yellow-500 mx-auto" />
+                    ) : index === 1 ? (
+                      <Trophy className="h-5 w-5 text-slate-400 mx-auto" />
+                    ) : index === 2 ? (
+                      <Trophy className="h-5 w-5 text-amber-700 mx-auto" />
+                    ) : (
+                      index + 1
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {entry.playerName}
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-green-600">
+                    ${entry.score}
+                  </TableCell>
+                  <TableCell className="text-right text-slate-600 dark:text-slate-300">
+                    {formatDuration(entry.timeTaken)}
+                  </TableCell>
+                  <TableCell className="text-right hidden md:table-cell">
+                    <span className="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800">
+                      {getEfficiencyScore(entry.score, entry.timeTaken)} pts/min
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

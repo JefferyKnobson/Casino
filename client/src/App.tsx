@@ -1,5 +1,5 @@
 import { Suspense, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { useAudio } from "./lib/stores/useAudio";
 import { useCasinoGame } from "./lib/stores/useCasinoGame";
 import Layout from "./components/Layout";
@@ -7,6 +7,7 @@ import CasinoLobby from "./components/CasinoLobby";
 import BlackjackGame from "./components/Blackjack/BlackjackGame";
 import RideTheBusGame from "./components/RoundTheBus/RoundTheBusGame";
 import SlotMachine from "./components/SlotMachine/SlotMachine";
+import GameHUD from "./components/common/GameHUD";
 import NotFound from "./pages/not-found";
 import { initAudio } from "./lib/utils/audio";
 import { Toaster } from "./components/ui/sonner";
