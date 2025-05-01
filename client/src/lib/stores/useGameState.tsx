@@ -496,12 +496,12 @@ export const useGameState = create<GameState>((set, get) => ({
     });
   },
   
-  chooseHigher: () => {
-    return playRoundTheBusTurn("higher");
+  chooseHigher: function() {
+    return playRoundTheBusTurn.call(this, "higher");
   },
   
-  chooseLower: () => {
-    return playRoundTheBusTurn("lower");
+  chooseLower: function() {
+    return playRoundTheBusTurn.call(this, "lower");
   },
   
   resetRoundTheBus: () => {
@@ -604,8 +604,9 @@ function calculateHandValue(hand: Card[]): number {
 }
 
 // Round the Bus turn logic
-function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
-  const { roundTheBus } = get();
+function playRoundTheBusTurn(this: any, choice: "higher" | "lower"): boolean {
+  // Access the state using this context
+  const { roundTheBus } = this.getState();
   const { deck, pyramid, currentCard, currentLevel } = roundTheBus;
   
   if (!currentCard || roundTheBus.gamePhase !== "playing") {
@@ -674,7 +675,7 @@ function playRoundTheBusTurn(choice: "higher" | "lower"): boolean {
   };
   
   // Update state
-  set({
+  this.setState({
     roundTheBus: {
       ...roundTheBus,
       deck: newDeck,
