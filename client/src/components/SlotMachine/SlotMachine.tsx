@@ -7,18 +7,21 @@ import { useAudio } from "@/lib/stores/useAudio";
 import { playSound } from "@/lib/utils/audio";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
 import { CasinoButton } from "../ui/button-casino";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Reel from "./Reel";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
 import { slotSymbolData } from "@/assets/svg/slot-symbols";
 import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
+import LeaderboardTab from "../Leaderboard/LeaderboardTab";
 
 const SlotMachine = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("game");
   const [confettiConfig, setConfettiConfig] = useState<{
     particleCount: number;
     duration: number;
@@ -251,93 +254,106 @@ const SlotMachine = () => {
         </CasinoCardContent>
       </CasinoCard>
       
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
-        {/* Slot machine top */}
-        <div className="bg-gradient-to-r from-amber-700 to-amber-900 p-3 text-amber-100 flex justify-between items-center">
-          <div className="font-bold">
-            Balance: ${balance}
-          </div>
-          {slotMachine.bet > 0 && (
-            <div>
-              Bet: ${slotMachine.bet}
-            </div>
-          )}
-          {slotMachine.lastResult?.winAmount ? (
-            <div className="font-bold text-amber-200">
-              Win: ${slotMachine.lastResult.winAmount}
-            </div>
-          ) : (
-            <div>Win: $0</div>
-          )}
-        </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="game" className="text-base">Game</TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
+        </TabsList>
         
-        {/* Slot machine body */}
-        <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-8">
-          {/* Show out of money message when broke */}
-          {isBroke && !slotMachine.bet && (
-            <div className="text-center py-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-4">You're out of money!</h2>
-              <p className="mb-6 text-gray-300">Reset your balance to continue playing.</p>
-              <CasinoButton
-                variant="red"
-                onClick={resetBalance}
-              >
-                Reset Balance to $250
-              </CasinoButton>
-            </div>
-          )}
-          
-          {/* Only show game elements if not broke or if game has a bet */}
-          {(!isBroke || slotMachine.bet > 0) && (
-            <>
-              {/* Reels container */}
-              <div className="relative mb-8">
-                {/* Reels */}
-                <div className="flex justify-center gap-3 mb-2">
-                  {slotMachine.reels.map((reel, index) => (
-                    <Reel
-                      key={index}
-                      spinning={spinning}
-                      symbol={getVisibleSymbols()[index]}
-                      delay={index * 0.5}
-                      isWinning={
-                        slotMachine.lastResult?.winLines.includes(0) &&
-                        !spinning
-                      }
-                    />
-                  ))}
-                </div>
-                
-                {/* Payline removed as requested */}
-                
-                {/* Win markers */}
-                {slotMachine.lastResult?.winLines.includes(0) && !spinning && (
-                  <>
-                    <motion.div 
-                      className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
-                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 1 }}
-                    />
-                    <motion.div 
-                      className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
-                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 1 }}
-                    />
-                  </>
-                )}
+        <TabsContent value="game" className="mt-0">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+            {/* Slot machine top */}
+            <div className="bg-gradient-to-r from-amber-700 to-amber-900 p-3 text-amber-100 flex justify-between items-center">
+              <div className="font-bold">
+                Balance: ${balance}
               </div>
+              {slotMachine.bet > 0 && (
+                <div>
+                  Bet: ${slotMachine.bet}
+                </div>
+              )}
+              {slotMachine.lastResult?.winAmount ? (
+                <div className="font-bold text-amber-200">
+                  Win: ${slotMachine.lastResult.winAmount}
+                </div>
+              ) : (
+                <div>Win: $0</div>
+              )}
+            </div>
+            
+            {/* Slot machine body */}
+            <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-8">
+              {/* Show out of money message when broke */}
+              {isBroke && !slotMachine.bet && (
+                <div className="text-center py-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-4">You're out of money!</h2>
+                  <p className="mb-6 text-gray-300">Reset your balance to continue playing.</p>
+                  <CasinoButton
+                    variant="red"
+                    onClick={resetBalance}
+                  >
+                    Reset Balance to $250
+                  </CasinoButton>
+                </div>
+              )}
               
-              {/* Controls */}
-              {renderBettingControls()}
-            </>
-          )}
-        </div>
+              {/* Only show game elements if not broke or if game has a bet */}
+              {(!isBroke || slotMachine.bet > 0) && (
+                <>
+                  {/* Reels container */}
+                  <div className="relative mb-8">
+                    {/* Reels */}
+                    <div className="flex justify-center gap-3 mb-2">
+                      {slotMachine.reels.map((reel, index) => (
+                        <Reel
+                          key={index}
+                          spinning={spinning}
+                          symbol={getVisibleSymbols()[index]}
+                          delay={index * 0.5}
+                          isWinning={
+                            slotMachine.lastResult?.winLines.includes(0) &&
+                            !spinning
+                          }
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Payline removed as requested */}
+                    
+                    {/* Win markers */}
+                    {slotMachine.lastResult?.winLines.includes(0) && !spinning && (
+                      <>
+                        <motion.div 
+                          className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                          animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                          transition={{ repeat: Infinity, duration: 1 }}
+                        />
+                        <motion.div 
+                          className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full"
+                          animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                          transition={{ repeat: Infinity, duration: 1 }}
+                        />
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Controls */}
+                  {renderBettingControls()}
+                </>
+              )}
+            </div>
+            
+            {/* Paytable */}
+            <div className="p-4">
+              {renderPaytable()}
+            </div>
+          </div>
+        </TabsContent>
         
-        {/* Paytable */}
-        <div className="p-4">
-          {renderPaytable()}
-        </div>
-      </div>
+        <TabsContent value="leaderboard" className="mt-0">
+          <LeaderboardTab />
+        </TabsContent>
+      </Tabs>
       
       {/* Coin animation */}
       {showAnimation && (

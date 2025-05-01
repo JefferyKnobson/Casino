@@ -11,15 +11,18 @@ import Card from "./Card";
 import GameControls from "./GameControls";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
 import { CasinoButton } from "../ui/button-casino";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Chip, { ChipStack } from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
 import { Button } from "../ui/button";
+import LeaderboardTab from "../Leaderboard/LeaderboardTab";
 
 const BlackjackGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("game");
   const [confettiConfig, setConfettiConfig] = useState<{
     particleCount: number;
     duration: number;

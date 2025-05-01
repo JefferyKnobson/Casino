@@ -7,10 +7,12 @@ import { playSound } from "@/lib/utils/audio";
 import { shouldTriggerCelebration, getConfettiConfig } from "@/lib/utils/celebration";
 import { CasinoCard, CasinoCardContent, CasinoCardHeader, CasinoCardTitle } from "../ui/card-casino";
 import { CasinoButton } from "../ui/button-casino";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import GameBoard from "./GameBoard";
 import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
+import LeaderboardTab from "../Leaderboard/LeaderboardTab";
 
 // Function to calculate the payout based on the number of correct guesses (position)
 const calculateRideTheBusPayout = (state: any) => {
@@ -36,6 +38,7 @@ const RideTheBusGame = () => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animationAmount, setAnimationAmount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("game");
   const [confettiConfig, setConfettiConfig] = useState<{
     particleCount: number;
     duration: number;
@@ -220,71 +223,84 @@ const RideTheBusGame = () => {
         </CasinoCardContent>
       </CasinoCard>
       
-      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 border border-slate-200 dark:border-slate-800">
-        {/* Show out of money message when broke */}
-        {isBroke && roundTheBus.gamePhase === "betting" && (
-          <div className="text-center py-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
-            <CasinoButton
-              variant="green"
-              onClick={resetBalance}
-            >
-              Reset Balance to $250
-            </CasinoButton>
-          </div>
-        )}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="game" className="text-base">Game</TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
+        </TabsList>
         
-        {/* Only show game elements if not broke or if game is in progress */}
-        {(!isBroke || roundTheBus.gamePhase !== "betting") && (
-          <>
-            {/* Game Board */}
-            {roundTheBus.currentCard && (
-              <GameBoard 
-                cardsInPlay={roundTheBus.cardsInPlay}
-                currentCard={roundTheBus.currentCard}
-                currentPosition={roundTheBus.currentPosition}
-                bet={roundTheBus.bet}
-              />
+        <TabsContent value="game" className="mt-0">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md p-6 border border-slate-200 dark:border-slate-800">
+            {/* Show out of money message when broke */}
+            {isBroke && roundTheBus.gamePhase === "betting" && (
+              <div className="text-center py-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">You're out of money!</h2>
+                <p className="mb-6 text-gray-600 dark:text-gray-400">Reset your balance to continue playing.</p>
+                <CasinoButton
+                  variant="green"
+                  onClick={resetBalance}
+                >
+                  Reset Balance to $250
+                </CasinoButton>
+              </div>
             )}
             
-            {/* Game Controls */}
-            {roundTheBus.gamePhase === "betting" && renderBettingPhase()}
-          </>
-        )}
-        
-        {roundTheBus.gamePhase === "playing" && (
-          <div className="mt-8 flex justify-center gap-6">
-            <CasinoButton
-              variant="blue"
-              size="xl"
-              onClick={handleHigher}
-            >
-              Higher ↑
-            </CasinoButton>
+            {/* Only show game elements if not broke or if game is in progress */}
+            {(!isBroke || roundTheBus.gamePhase !== "betting") && (
+              <>
+                {/* Game Board */}
+                {roundTheBus.currentCard && (
+                  <GameBoard 
+                    cardsInPlay={roundTheBus.cardsInPlay}
+                    currentCard={roundTheBus.currentCard}
+                    currentPosition={roundTheBus.currentPosition}
+                    bet={roundTheBus.bet}
+                  />
+                )}
+                
+                {/* Game Controls */}
+                {roundTheBus.gamePhase === "betting" && renderBettingPhase()}
+              </>
+            )}
             
-            <CasinoButton
-              variant="red"
-              size="xl"
-              onClick={handleLower}
-            >
-              Lower ↓
-            </CasinoButton>
+            {roundTheBus.gamePhase === "playing" && (
+              <div className="mt-8 flex justify-center gap-6">
+                <CasinoButton
+                  variant="blue"
+                  size="xl"
+                  onClick={handleHigher}
+                >
+                  Higher ↑
+                </CasinoButton>
+                
+                <CasinoButton
+                  variant="red"
+                  size="xl"
+                  onClick={handleLower}
+                >
+                  Lower ↓
+                </CasinoButton>
+              </div>
+            )}
+            
+            {roundTheBus.gamePhase === "finished" && (
+              <div className="mt-6 flex justify-center">
+                <CasinoButton
+                  variant="green"
+                  size="xl"
+                  onClick={handleNewGame}
+                >
+                  Play Again
+                </CasinoButton>
+              </div>
+            )}
           </div>
-        )}
+        </TabsContent>
         
-        {roundTheBus.gamePhase === "finished" && (
-          <div className="mt-6 flex justify-center">
-            <CasinoButton
-              variant="green"
-              size="xl"
-              onClick={handleNewGame}
-            >
-              Play Again
-            </CasinoButton>
-          </div>
-        )}
-      </div>
+        <TabsContent value="leaderboard" className="mt-0">
+          <LeaderboardTab />
+        </TabsContent>
+      </Tabs>
       
       {/* Coin animation */}
       {showAnimation && (
