@@ -45,11 +45,24 @@ interface SlotMachineState {
   } | null;
 }
 
+// Ride the Bus specific state
+interface RideTheBusState {
+  deck: Card[];
+  cardsInPlay: (Card | null)[];
+  currentPosition: number; // 0-3 representing which card we're at in the sequence
+  currentCard: Card | null;
+  stage: number; // 0: Red/Black, 1: Higher/Lower, 2: Inside/Outside, 3: Guess Suit
+  bet: number;
+  history: { card: Card; result: string }[];
+  gamePhase: "betting" | "playing" | "finished";
+}
+
 // Combined game state
 interface GameState {
   blackjack: BlackjackState;
   roundTheBus: RoundTheBusState;
   slotMachine: SlotMachineState;
+  rideTheBus: RideTheBusState;
   
   // Blackjack actions
   initBlackjack: () => void;
@@ -68,6 +81,21 @@ interface GameState {
   chooseHigher: () => boolean;
   chooseLower: () => boolean;
   resetRoundTheBus: () => void;
+  
+  // Ride the Bus actions
+  initRideTheBus: () => void;
+  placeRideTheBusBet: (amount: number) => void;
+  chooseRed: () => boolean;
+  chooseBlack: () => boolean;
+  chooseHigherRide: () => boolean;
+  chooseLowerRide: () => boolean;
+  chooseInside: () => boolean;
+  chooseOutside: () => boolean;
+  chooseHearts: () => boolean;
+  chooseDiamonds: () => boolean;
+  chooseClubs: () => boolean;
+  chooseSpades: () => boolean;
+  resetRideTheBus: () => void;
   
   // Slot machine actions
   initSlotMachine: () => void;
@@ -96,6 +124,17 @@ const initialRoundTheBusState: RoundTheBusState = {
   cardsInPlay: [null, null, null, null, null],
   currentPosition: 0,
   currentCard: null,
+  bet: 0,
+  history: [],
+  gamePhase: "betting",
+};
+
+const initialRideTheBusState: RideTheBusState = {
+  deck: [],
+  cardsInPlay: [null, null, null, null],
+  currentPosition: 0,
+  currentCard: null,
+  stage: 0,
   bet: 0,
   history: [],
   gamePhase: "betting",
