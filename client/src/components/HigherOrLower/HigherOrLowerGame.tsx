@@ -13,13 +13,7 @@ import Chip from "../ui/chip";
 import CoinAnimation from "../ui/coin-animation";
 import ConfettiExplosion from "../ui/confetti-explosion";
 import LeaderboardTab from "../Leaderboard/LeaderboardTab";
-
-// Card type interface
-interface Card {
-  suit: "hearts" | "diamonds" | "clubs" | "spades";
-  value: number;
-  faceUp: boolean;
-}
+import { Card, createDeck, shuffleDeck } from "@/lib/utils/cards";
 
 // Simple Higher or Lower game with increasing stake
 const HigherOrLowerGame = () => {
@@ -58,28 +52,7 @@ const HigherOrLowerGame = () => {
     initGame();
   }, []);
   
-  // Helper to create and shuffle a deck
-  const createDeck = (): Card[] => {
-    const suits: ("hearts" | "diamonds" | "clubs" | "spades")[] = ["hearts", "diamonds", "clubs", "spades"];
-    const deck: Card[] = [];
-    
-    suits.forEach(suit => {
-      for (let value = 1; value <= 13; value++) {
-        deck.push({ suit, value, faceUp: false });
-      }
-    });
-    
-    return shuffleDeck(deck);
-  };
-  
-  const shuffleDeck = (deck: Card[]): Card[] => {
-    const newDeck = [...deck];
-    for (let i = newDeck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
-    }
-    return newDeck;
-  };
+  // We're using the imported createDeck and shuffleDeck functions
   
   // Initialize or reset the game
   const initGame = () => {

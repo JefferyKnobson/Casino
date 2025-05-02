@@ -1,13 +1,7 @@
 import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import Card from "../Blackjack/Card";
-
-// Define the card type
-interface CardType {
-  suit: "hearts" | "diamonds" | "clubs" | "spades";
-  value: number;
-  faceUp: boolean;
-}
+import { Card as CardType } from "@/lib/utils/cards";
 
 interface GameBoardProps extends HTMLAttributes<HTMLDivElement> {
   currentCard: CardType | null;
