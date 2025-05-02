@@ -123,5 +123,13 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions",
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ]
 }
