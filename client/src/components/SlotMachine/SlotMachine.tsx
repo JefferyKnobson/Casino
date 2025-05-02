@@ -274,10 +274,10 @@ const SlotMachine = () => {
         </CasinoCardContent>
       </CasinoCard>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4">
-        <TabsList className="grid w-full grid-cols-2 mb-4 shadow-sm">
-          <TabsTrigger value="game" className="text-base font-medium">Game</TabsTrigger>
-          <TabsTrigger value="leaderboard" className="text-base font-medium">Leaderboard</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="game" className="text-base">Game</TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
         </TabsList>
         
         <TabsContent value="game" className="mt-0">
