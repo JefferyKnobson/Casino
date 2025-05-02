@@ -10,13 +10,11 @@ export interface SlotSymbol {
 // Slot machine symbols configuration
 export const slotSymbols: SlotSymbol[] = [
   { id: "seven", symbol: "7️⃣", name: "Seven", value: 100, rarity: 1 },
-  { id: "diamond", symbol: "💎", name: "Diamond", value: 50, rarity: 2 },
-  { id: "clover", symbol: "🍀", name: "Clover", value: 25, rarity: 3 },
-  { id: "bell", symbol: "🔔", name: "Bell", value: 15, rarity: 4 },
+  { id: "bell", symbol: "🔔", name: "Bell", value: 25, rarity: 1 },
+  { id: "cherry", symbol: "🍒", name: "Cherry", value: 10, rarity: 6 },
+  { id: "lemon", symbol: "🍋", name: "Lemon", value: 10, rarity: 6 },
   { id: "grape", symbol: "🍇", name: "Grape", value: 10, rarity: 6 },
-  { id: "orange", symbol: "🍊", name: "Orange", value: 8, rarity: 8 },
-  { id: "lemon", symbol: "🍋", name: "Lemon", value: 5, rarity: 10 },
-  { id: "cherry", symbol: "🍒", name: "Cherry", value: 3, rarity: 12 },
+  { id: "watermelon", symbol: "🍉", name: "Watermelon", value: 10, rarity: 6 },
 ];
 
 // Generate random symbol based on rarity weights
