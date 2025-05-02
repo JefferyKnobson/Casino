@@ -22,6 +22,8 @@ const SlotMachine = () => {
   const [spinning, setSpinning] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("game");
+  // Force re-renders when needed
+  const [forceUpdate, setForceUpdate] = useState(0);
   const [confettiConfig, setConfettiConfig] = useState<{
     particleCount: number;
     duration: number;
@@ -74,14 +76,37 @@ const SlotMachine = () => {
       setTimeout(() => playSound("success", 0.7), 300);
     }
     
-    // Round down to nearest 5 for consistency with chip values
-    const allInAmount = Math.floor(balance / 5) * 5;
+    // Find the highest valid bet amount based on available chips (5, 10, 25, 50, 100)
+    let betAmount = 0;
+    const validBets = [5, 10, 25, 50, 100];
     
-    // Safeguard to ensure we don't bet more than available
-    const betAmount = Math.min(allInAmount, balance);
+    // Find the highest valid bet amount less than or equal to the balance
+    for (const bet of validBets) {
+      if (bet <= balance) {
+        betAmount = bet;
+      } else {
+        break;
+      }
+    }
     
+    // If we can do multiple of the highest chip, calculate how many we can use
+    if (betAmount > 0 && betAmount * 2 <= balance) {
+      // Maximum multiple of the highest bet we can use
+      const multiples = Math.floor(balance / betAmount);
+      betAmount = betAmount * multiples;
+    }
+    
+    if (betAmount <= 0) {
+      toast.error("Not enough balance for a valid bet!");
+      return;
+    }
+    
+    // Update the bet in state
     placeSlotBet(betAmount);
     toast.success(`All in! Betting $${betAmount}`, { duration: 2000 });
+    
+    // Force a re-render to update UI immediately
+    setForceUpdate(prev => prev + 1);
   };
   
   // Handle spinning the reels
@@ -203,7 +228,7 @@ const SlotMachine = () => {
           className="text-sm whitespace-nowrap"
           size="sm"
         >
-          All In (${Math.floor(balance / 5) * 5})
+          All In
         </CasinoButton>
         
         <CasinoButton
