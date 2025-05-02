@@ -17,28 +17,44 @@ const CoinAnimation = ({ amount, onComplete, isWinning = true }: CoinAnimationPr
       return;
     }
 
-    // Determine the number and types of coins to show based on amount
-    const coinValues: ChipValue[] = [1000, 500, 100, 50, 25, 10, 5, 1];
-    const coinsToShow: ChipValue[] = [];
+    // Determine appropriate chip values based on the win amount
+    let coinsToShow: ChipValue[] = [];
+    const winAmount = Math.abs(amount);
     
-    let remainingAmount = Math.abs(amount);
+    // For more accurate representation of win amounts
+    if (winAmount >= 1000) {
+      coinsToShow.push(1000);
+      if (winAmount >= 1500) coinsToShow.push(500);
+      if (winAmount >= 1600) coinsToShow.push(100);
+    } else if (winAmount >= 500) {
+      coinsToShow.push(500);
+      if (winAmount >= 600) coinsToShow.push(100);
+      if (winAmount >= 650) coinsToShow.push(50);
+    } else if (winAmount >= 100) {
+      coinsToShow.push(100);
+      if (winAmount >= 150) coinsToShow.push(50);
+      if (winAmount >= 175) coinsToShow.push(25);
+    } else if (winAmount >= 50) {
+      coinsToShow.push(50);
+      if (winAmount >= 75) coinsToShow.push(25);
+    } else if (winAmount >= 25) {
+      coinsToShow.push(25);
+      if (winAmount >= 35) coinsToShow.push(10);
+    } else if (winAmount >= 10) {
+      coinsToShow.push(10);
+      if (winAmount >= 15) coinsToShow.push(5);
+    } else {
+      coinsToShow.push(5);
+    }
     
-    // Calculate coins needed to represent the amount
-    coinValues.forEach(value => {
-      while (remainingAmount >= value) {
-        coinsToShow.push(value);
-        remainingAmount -= value;
-      }
-    });
-    
-    // Limit to max 10 coins for performance
-    const limitedCoins = coinsToShow.slice(0, 10);
+    // Limit to max 5 coins
+    coinsToShow = coinsToShow.slice(0, 5);
     
     // Create coins with random positions
-    const newCoins = limitedCoins.map((value, index) => {
-      // Calculate random positions
-      const randomX = Math.random() * 200 - 100; // -100 to 100
-      const randomY = Math.random() * 200 - 100; // -100 to 100
+    const newCoins = coinsToShow.map((value, index) => {
+      // Calculate random positions - more compact spread
+      const randomX = Math.random() * 160 - 80; // -80 to 80
+      const randomY = Math.random() * 160 - 80; // -80 to 80
       
       return {
         id: index,
@@ -50,11 +66,11 @@ const CoinAnimation = ({ amount, onComplete, isWinning = true }: CoinAnimationPr
     
     setCoins(newCoins);
     
-    // Cleanup after animation
+    // Cleanup after animation - shorter duration
     const timer = setTimeout(() => {
       setCoins([]);
       onComplete?.();
-    }, 2000);
+    }, 1200); // Reduced from 2000ms to 1200ms
     
     return () => clearTimeout(timer);
   }, [amount, onComplete]);
@@ -87,8 +103,8 @@ const CoinAnimation = ({ amount, onComplete, isWinning = true }: CoinAnimationPr
               }}
               transition={{
                 type: "spring",
-                duration: 1.5,
-                delay: coin.id * 0.1,
+                duration: 0.8,
+                delay: coin.id * 0.05,
               }}
             >
               <Chip 

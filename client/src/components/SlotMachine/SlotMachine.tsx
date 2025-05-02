@@ -88,6 +88,12 @@ const SlotMachine = () => {
   const handleSpin = async () => {
     if (spinning || !slotMachine.bet) return;
     
+    // Check if player has enough balance for this bet
+    if (balance < slotMachine.bet) {
+      toast.error("Not enough balance to spin!");
+      return;
+    }
+    
     setSpinning(true);
     
     if (!isMuted) {
@@ -98,6 +104,7 @@ const SlotMachine = () => {
       const result = await spinSlotMachine();
       
       // Update balance and game history
+      const newBalance = balance + (result.winAmount - slotMachine.bet);
       updateBalance(result.winAmount - slotMachine.bet);
       
       // Play appropriate sound
@@ -134,22 +141,31 @@ const SlotMachine = () => {
           // Show appropriate toast message based on win size
           if (celebration.tier === 'jackpot') {
             toast.success(`JACKPOT! You won $${result.winAmount}!`, {
-              duration: 5000,
+              duration: 3000,
               className: "font-bold text-xl",
             });
           } else if (celebration.tier === 'large') {
             toast.success(`BIG WIN! $${result.winAmount}!`, {
-              duration: 4000,
+              duration: 2500,
               className: "font-bold",
             });
           } else {
-            toast.success(`You won $${result.winAmount}!`);
+            toast.success(`You won $${result.winAmount}!`, { duration: 2000 });
           }
         } else {
-          toast.success(`You won $${result.winAmount}!`);
+          toast.success(`You won $${result.winAmount}!`, { duration: 2000 });
         }
       } else {
-        toast.error("Better luck next time!");
+        toast.error("Better luck next time!", { duration: 2000 });
+        
+        // If player just lost their last money, show game over message
+        if (newBalance <= 0) {
+          setTimeout(() => {
+            toast.error("You're out of money!", { duration: 3000 });
+            // Reset bet so the game shows the reset balance button
+            placeSlotBet(0);
+          }, 500);
+        }
       }
     } catch (error) {
       console.error("Error spinning:", error);
@@ -159,71 +175,75 @@ const SlotMachine = () => {
     }
   };
   
-  // Render betting controls
+  // Render betting controls - more compact version
   const renderBettingControls = () => (
-    <div className="flex flex-col items-center mt-6">
-      <h3 className="font-bold mb-3">Select Bet</h3>
+    <div className="flex flex-col items-center mt-3 sm:mt-6">
+      <h3 className="font-bold mb-2 text-sm sm:text-base">Select Bet</h3>
       
-      <div className="flex flex-wrap justify-center gap-3 mb-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-3">
         {[5, 10, 25, 50, 100].map(value => (
           <Chip
             key={value}
             value={value as any}
-            size="md"
+            size="sm"
             onClick={() => handlePlaceBet(value)}
             disabled={spinning || value > balance}
-            className={slotMachine.bet === value ? "ring-2 ring-offset-2 ring-primary" : ""}
+            className={slotMachine.bet === value ? "ring-2 ring-offset-1 ring-primary" : ""}
           />
         ))}
       </div>
       
-      {/* All In Button */}
-      <CasinoButton
-        variant="gold"
-        onClick={handleAllIn}
-        disabled={spinning || balance <= 0}
-        className="mb-3 animate-pulse"
-      >
-        All In (${Math.floor(balance / 5) * 5})
-      </CasinoButton>
-      
-      <CasinoButton
-        variant="red"
-        size="xl"
-        onClick={handleSpin}
-        disabled={spinning || !slotMachine.bet}
-        className="mt-2 w-full max-w-xs"
-      >
-        {spinning ? "Spinning..." : "SPIN"}
-      </CasinoButton>
+      {/* Buttons row */}
+      <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
+        {/* All In Button */}
+        <CasinoButton
+          variant="gold"
+          onClick={handleAllIn}
+          disabled={spinning || balance <= 0}
+          className="animate-pulse text-sm sm:text-base py-1.5 px-2"
+          size="sm"
+        >
+          All In (${Math.floor(balance / 5) * 5})
+        </CasinoButton>
+        
+        <CasinoButton
+          variant="red"
+          onClick={handleSpin}
+          disabled={spinning || !slotMachine.bet}
+          className="w-full py-1.5 text-sm sm:text-base"
+          size="sm"
+        >
+          {spinning ? "Spinning..." : "SPIN"}
+        </CasinoButton>
+      </div>
     </div>
   );
   
-  // Render the paytable - formatted to match the image
+  // Render the paytable - more compact version
   const renderPaytable = () => (
-    <div className="mt-8 p-4 bg-black text-white rounded-lg">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-lg">3 FRUIT:</span>
-          <span className="text-xl">🍋 🍉 🍒</span>
+    <div className="mt-2 p-3 bg-black text-white rounded-lg">
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="flex items-center gap-1">
+          <span>3 FRUIT:</span>
+          <span className="text-base">🍋🍉🍒</span>
           <span className="text-yellow-400 font-bold ml-auto">2x</span>
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-lg">SAME FRUIT:</span>
-          <span className="text-xl">🍇 🍇 🍇</span>
+        <div className="flex items-center gap-1">
+          <span>SAME FRUIT:</span>
+          <span className="text-base">🍇🍇🍇</span>
           <span className="text-yellow-400 font-bold ml-auto">10x</span>
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-lg">3 BELLS:</span>
-          <span className="text-xl">🔔 🔔 🔔</span>
+        <div className="flex items-center gap-1">
+          <span>3 BELLS:</span>
+          <span className="text-base">🔔🔔🔔</span>
           <span className="text-yellow-400 font-bold ml-auto">25x</span>
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-lg">3 SEVENS:</span>
-          <span className="text-xl text-red-600 font-bold">7 7 7</span>
+        <div className="flex items-center gap-1">
+          <span>3 SEVENS:</span>
+          <span className="text-base text-red-600 font-bold">777</span>
           <span className="text-yellow-400 font-bold ml-auto">100x</span>
         </div>
       </div>
@@ -241,13 +261,13 @@ const SlotMachine = () => {
   };
   
   return (
-    <div className="max-w-4xl mx-auto pt-6 max-h-screen overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
-      <CasinoCard gradient="red" bordered className="mb-6">
-        <CasinoCardHeader>
+    <div className="max-w-4xl mx-auto pt-4 pb-28 sm:pb-16 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
+      <CasinoCard gradient="red" bordered className="mb-4">
+        <CasinoCardHeader className="py-2">
           <CasinoCardTitle>Slot Machine</CasinoCardTitle>
         </CasinoCardHeader>
-        <CasinoCardContent>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <CasinoCardContent className="py-2">
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             <p>Place your bet and try your luck! Match symbols across the payline to win.</p>
             <p>Three matching symbols pay the biggest prizes. Two matching symbols from left to right pay smaller wins.</p>
           </div>
@@ -281,8 +301,8 @@ const SlotMachine = () => {
               )}
             </div>
             
-            {/* Slot machine body */}
-            <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-8">
+            {/* Slot machine body - reduced padding for mobile */}
+            <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 p-4 sm:p-6">
               {/* Show out of money message when broke */}
               {isBroke && !slotMachine.bet && (
                 <div className="text-center py-8">
@@ -343,8 +363,8 @@ const SlotMachine = () => {
               )}
             </div>
             
-            {/* Paytable */}
-            <div className="p-4">
+            {/* Paytable - reduced padding for smaller screens */}
+            <div className="p-2 sm:p-3">
               {renderPaytable()}
             </div>
           </div>
