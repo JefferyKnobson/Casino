@@ -5,7 +5,7 @@ import { useCasinoGame } from "./lib/stores/useCasinoGame";
 import Layout from "./components/Layout";
 import CasinoLobby from "./components/CasinoLobby";
 import BlackjackGame from "./components/Blackjack/BlackjackGame";
-import HigherOrLowerGame from "./components/RoundTheBus/RoundTheBusGame";
+import HigherOrLowerGame from "./components/HigherOrLower/HigherOrLowerGame";
 import RideTheBusGame from "./components/RideTheBus/RideTheBusGame";
 import SlotMachine from "./components/SlotMachine/SlotMachine";
 import GameHUD from "./components/common/GameHUD";
